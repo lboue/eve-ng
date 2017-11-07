@@ -320,6 +320,12 @@ function delOvs($s) {
 	}
 	return 0;
 }
+/**
+ * Function to disconnect a node port from an ovs bridge or pnet
+ *
+ * @param   string  $s                  OVS name
+ * @return  int                         0 means ok
+ */
 function disconnectNodePort($s) {
 	$cmd = 'ovs-vsctl del-port '.$s.' 2>&1';
         exec($cmd, $o, $rc);
@@ -622,9 +628,9 @@ function prepareNode($n, $id, $t, $nets) {
 	$cmd = 'id -u '.$user.' 2>&1';
 	exec($cmd, $o, $rc);
 	$uid = $o[0];
-	// Creating TAP interfaces
 	
 
+	// Creating TAP interfaces
 	 if ($n -> getNType() != 'docker') {
 	foreach ($n -> getEthernets() as $interface_id => $interface) {
 		error_log(date('M d H:i:s ').'INFO: interface found '.print_r($interface));
@@ -715,8 +721,6 @@ function prepareNode($n, $id, $t, $nets) {
 					error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80082]);
 					return 80082;
 				}
-				error_log(date('M d H:i:s ').'INFO: Console Type for node is:   '.$n -> getConsole());
-			error_log(date('M d H:i:s ').'INFO: Console Port for node is:   '.$n -> getCustomConsolePort());
 				if($n -> getCustomConsolePort() != '' ) {
 					$connPort = $n -> getCustomConsolePort();
 				}
@@ -737,7 +741,7 @@ function prepareNode($n, $id, $t, $nets) {
 				exec($cmd, $o, $rc);
 				if ($rc != 0) {
 					// Must create docker.io container
-					$cmd = 'docker -H=tcp://127.0.0.1:4243 create -ti --memory '.$n -> getRam().'M --privileged --net=bridge -p '.$n -> getPort().':'.$connPort.' --name='.$n -> getUuid().' -h '.$n -> getName().' '.$n -> getImage();
+					$cmd = 'docker -H=tcp://127.0.0.1:4243 create -ti --memory '.$n -> getRam().'M --privileged --net=bridge  -p '.$n -> getPort().':'.$connPort.' --name='.$n -> getUuid().' -h '.$n -> getName().' '.$n -> getImage();
 					error_log(date('M d H:i:s ').'INFO: starting '.$cmd);		
 					exec($cmd, $o, $rc);
 					if ($rc != 0) {
@@ -1053,11 +1057,9 @@ function start($n, $id, $t, $nets, $scripttimeout) {
 
 		}
 			$cmd = 'docker -H=tcp://127.0.0.1:4243 inspect --format "{{ .State.Pid }}" '.$n -> getUuid();
-			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 
 			$cmd = "ip link set netns ".$o['1']." ".$tap_name." name ".$tap_name."  up 2>&1";
-			error_log(date('M d H:i:s ').'INFO: starting '.$cmd);
 			exec($cmd, $o, $rc);
 
 		$cmd = 'nohup /opt/unetlab/scripts/'.$GLOBALS['node_config'][$n -> getTemplate()].' -a put -i '.$n -> getUuid().' -f '.$n -> getRunningPath().'/startup-config -t '.($n -> getDelay() + 300).' > /dev/null 2>&1 &';

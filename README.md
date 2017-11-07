@@ -55,6 +55,7 @@ chown www-data:www-data /var/run/openvswitch/db.sock
 * Ability to add links to already running devices (hotadd)
 
 ## Known Issues and todos
+* new functions need to be wrapped properly so we don't need to modify permissions
 * Need to link the ovs pnet interfaces to physical interfaces
 * Need to work on error checking for adding interfaces
 * Docker mgmt interface attaches as eth0. Need to change this to something such as mgmt0

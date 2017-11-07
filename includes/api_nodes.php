@@ -218,15 +218,30 @@ function apiExportLabNodes($lab, $tenant) {
 	}
 	return $output;
 }
-
+/*
+ * Function to delete Node interface from pnet or bridge
+ *
+ * If we delete a node to node connection, we just delete the vnet.
+ * For node connections to pnet or bridge we need to delete just the interface
+ * because we want to leave the pnet or bridge interface
+ *
+ * @param   Lab     $lab                Lab
+ * @param   int     $tenant             Tenant ID
+ * @param   array   $p            	Interface
+ * @return  Array                       Return code (JSend data)
+ */
 
 
 function apiDeleteNodeInterface($lab, $id, $p) {
-$interface_id = "vunl0_".$id."_".key($p);
-disconnectNodePort($interface_id);
-$rc = $lab ->disconnectNodeInterface($id,key($p));
-file_put_contents('/opt/unetlab/html/id.txt', print_r($interface_id, true));
-    if ($rc === 0) {
+	$interface_id = "vunl0_".$id."_".key($p);
+	
+	// handles deleted from the OVS
+	disconnectNodePort($interface_id);
+	
+	// handes updating the xml
+	$rc = $lab ->disconnectNodeInterface($id,key($p));
+
+    	if ($rc === 0) {
                 $output['code'] = 201;
                 $output['status'] = 'success';
                 $output['message'] = $GLOBALS['messages'][60023];
@@ -255,8 +270,8 @@ function apiEditLabNodeInterfaces($lab, $id, $p) {
 	// todo: should check if node is running and bypass if node is off
 	//$rc2 = connectInterface2($lab -> getNodesEthernets($id,$p));
 	$connectIntA=$lab -> getNodesEthernets($id,$p);
-	file_put_contents('/opt/unetlab/html/id.txt', print_r($connectIntA, true));
-	file_put_contents('/opt/unetlab/html/lab.txt', print_r($lab , true));
+	
+	// handles attaching via ovs
 	if(!empty($connectIntA)) {
 		connectInterface($connectIntA[0],$connectIntA[1],$connectIntA[2]);	
 	}
