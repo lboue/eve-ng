@@ -7,6 +7,7 @@ cp /etc/network/interfaces ./interfaces.bak
 sudo apt-get install docker.io
 
 # fix docker config conflict
+mkdir -p /etc/systemd/system/docker.service.d
 cat > /etc/systemd/system/docker.service.d/service.conf << EOF
 [Service]
 ExecStart=
