@@ -36,9 +36,8 @@ docker pull danielguerra/wireshark-vnc
 
 Next, you will need to create a docker node with this image inside your lab.
 
-Once the image is running you will need to add the container id to includes/.config 
+Once the image is running you will need to add the container id to /opt/unetlab/html/includes/.config 
 The format is labid_tenantid_nodeid
-
 You can also find it by using docker ps from the cli.
 
 Note: The script which adds the capture inteface dosent have rights to modify the ovs db. I need to fix this but for the time being you can
