@@ -22,6 +22,7 @@
 class Interfc {
 	private $id;
 	private $name;
+	private $color;
 	private $network_id;
 	private $remote_id;
 	private $remote_if;
@@ -63,6 +64,11 @@ class Interfc {
 			unset($p['name']);
 			error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10002]);
 		}
+                if (isset($p['color']) && $p['color'] === '') {
+                        // Name is empty, ignored
+                        unset($p['color']);
+                        error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10002]);
+                }
 
 		if ($p['type'] == 'ethernet') {
 			if (isset($p['network_id']) && (int) $p['network_id'] <= 0) {
@@ -89,6 +95,7 @@ class Interfc {
 		// Now building the interface
 		$this -> id = (int) $id;
 		$this -> type = $p['type'];
+		if (isset($p['color'])) $this -> color = htmlentities($p['color']);
 		if (isset($p['name'])) $this -> name = htmlentities($p['name']);
 
 		// Building ethernet interface
@@ -127,6 +134,15 @@ class Interfc {
 			$this -> name = htmlentities($p['name']);
 			$modified = True;
 		}
+		 if (isset($p['color']) && $p['color'] === '') {
+                        // Name is empty, unset the current one
+			 unset($p['color']);
+			$modified = True;
+                } else if (isset($p['color'])) {
+                        $this -> color = htmlentities($p['color']);
+                        $modified = True;
+                }
+
 
 		if ($this -> type == 'ethernet') {
 			if (isset($p['remote_id']) || isset($p['remote_if'])) {
@@ -229,6 +245,22 @@ class Interfc {
 			return 0;
 		}
 	}
+
+
+
+        /**
+         * Method to get interface color.
+         *
+         * @return      string                      Interface color
+         */
+        public function getInterfaceColor() {
+		if (isset($this -> color)) {
+                	return $this -> color;
+		}
+		else {
+		return "0000FF";
+		}
+        }
 
 	/**
 	 * Method to get interface type.

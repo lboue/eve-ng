@@ -544,7 +544,8 @@ function apiGetLabNodeInterfaces($lab, $id) {
 		foreach ($lab -> getNodes()[$id] -> getEthernets() as $interface_id => $interface) {
 			$ethernets[$interface_id] = Array(
 				'name' => $interface -> getName(),
-				'network_id' => $interface -> getNetworkId()
+				'network_id' => $interface -> getNetworkId(),
+				//'color' => $interface -> getInterfaceColor()
 			);
 		}
 		$serials = Array();

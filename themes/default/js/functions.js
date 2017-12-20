@@ -824,7 +824,7 @@ function getNodeInterfaces(node_id) {
         dataType: 'json',
         success: function (data) {
             if (data['status'] == 'success') {
-                // logger(1, 'DEBUG: got node(s) from lab "' + lab_filename + '".');
+                 logger(1, 'DEBUG: got node(s) interfaces from lab "' + lab_filename + '".');
                 deferred.resolve(data['data']);
             } else {
                 // Application error
@@ -3146,7 +3146,6 @@ function printLabTopology() {
         , loadingLabHtml = '' +
             '<div id="loading-lab" class="loading-lab">' +
             '<div class="container">' +
-            '<img src="/themes/default/images/wait.gif"/><br />' +
             '<h3>Loading Lab</h3>' +
             '<div class="progress">' +
             '<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>' +
@@ -3353,7 +3352,7 @@ function printLabTopology() {
                 lab_topology.setContainer($("#lab-viewport"));
                 lab_topology.importDefaults({
                     Anchor: 'Continuous',
-                    Connector: ['Straight'],
+                    Connector: ['Bezier'],
                     Endpoint: 'Blank',
                     PaintStyle: {strokeWidth: 2, stroke: '#c00001'},
                     cssClass: 'link'
@@ -3426,6 +3425,7 @@ function printLabTopology() {
                     var type = link['type'],
                         source = link['source'],
                         source_label = link['source_label'],
+			link_color = link['link_color'],
                         destination = link['destination'],
                         destination_label = link['destination_label'],
                         src_label = ["Label"],
@@ -3435,7 +3435,7 @@ function printLabTopology() {
                         if (source_label != '') {
                             src_label.push({
                                 label: source_label,
-                                location: 0.15,
+                                location: 0.07,
                                 cssClass: 'node_interface ' + source + ' ' + destination
                             });
                         } else {
@@ -3444,7 +3444,7 @@ function printLabTopology() {
                         if (destination_label != '') {
                             dst_label.push({
                                 label: destination_label,
-                                location: 0.85,
+                                location: 0.93,
                                 cssClass: 'node_interface ' + source + ' ' + destination
                             });
                         } else {
@@ -3456,13 +3456,13 @@ function printLabTopology() {
                             source: source,       // Must attach to the IMG's parent or not printed correctly
                             target: destination,  // Must attach to the IMG's parent or not printed correctly
                             cssClass: source + ' ' + destination + ' frame_ethernet',
-                            paintStyle: {strokeWidth: 2, stroke: '#0066aa'},
+                            paintStyle: {strokeWidth: 2, stroke: '#' + link_color + ''},
                             overlays: [src_label, dst_label]
                         });
                         if (destination.substr(0, 7) == 'network') {
                               $.when( getNodeInterfaces(source.replace('node',''))).done( function ( ifaces ) {
                                   for ( ikey in ifaces['ethernet'] ) {
-                                      if ( ifaces['ethernet'][ikey]['name'] == source_label ) {
+                                      if ( ifaces['ethernet'][ikey]['color'] == source_label ) {
                                          tmp_conn.id = 'iface:'+source+":"+ikey
                                       }
                                   }
@@ -4720,6 +4720,30 @@ function textObjectResize(event, ui, shape_options) {
     if ($("p", ui.element).length && $(ui.element).width() > newWidth) {
         ui.size.width = $(ui.element).width();
     }
+}
+// Edit Form: Link
+function printFormEditLink(id) {
+    
+ var html = '<form id="addConn" class="addConn-form">' +
+        '<div class="row">' +
+        '<div class="col-md-8 col-md-offset-1 form-group">' +
+        '<label class="col-md-3 control-label form-group-addon">Link Color</label>' +
+        '<div class="col-md-5">' +
+        '<input type="color" class="form-control link_color">' +
+        '</div>' +
+        '</div> <br>' +
+        '<button type="submit" class="btn btn-success col-md-offset-1">' + MESSAGES[47] + '</button>' +
+        '<button type="button" class="btn" data-dismiss="modal">' + MESSAGES[18] + '</button>' +
+        '</div>' +
+        '<input  type="text" class="hide left-coordinate" value="100">' +
+        '<input  type="text" class="hide top-coordinate" value="100">' +
+        '</form>';
+
+ 
+
+
+addModal("Edit Link Color", html, '');
+ $('#body').append(html);
 }
 
 // Edit Form: Custom Shape

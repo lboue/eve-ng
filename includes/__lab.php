@@ -298,6 +298,7 @@ class Lab {
 					$i = Array();
 					if (isset($interface -> attributes() -> id)) $i['id'] = (string) $interface -> attributes() -> id;
 					if (isset($interface -> attributes() -> network_id)) $i['network_id'] = (string) $interface -> attributes() -> network_id;
+					if (isset($interface -> attributes() -> color)) $i['color'] = (string) $interface -> attributes() -> color;
 					if (isset($interface -> attributes() -> remote_id)) $i['remote_id'] = (string) $interface -> attributes() -> remote_id;
 					if (isset($interface -> attributes() -> remote_if)) $i['remote_if'] = (string) $interface -> attributes() -> remote_if;
 					if (isset($interface -> attributes() -> remote_host)) $i['remote_host'] = (string) $interface -> attributes() -> remote_host;
