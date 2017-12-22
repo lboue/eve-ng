@@ -258,7 +258,7 @@ class Interfc {
                 	return $this -> color;
 		}
 		else {
-		return "0000FF";
+		return "0066aa";
 		}
         }
 

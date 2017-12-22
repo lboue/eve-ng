@@ -545,7 +545,7 @@ function apiGetLabNodeInterfaces($lab, $id) {
 			$ethernets[$interface_id] = Array(
 				'name' => $interface -> getName(),
 				'network_id' => $interface -> getNetworkId(),
-				//'color' => $interface -> getInterfaceColor()
+				'color' => $interface -> getInterfaceColor()
 			);
 		}
 		$serials = Array();

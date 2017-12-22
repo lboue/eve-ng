@@ -824,8 +824,8 @@ function getNodeInterfaces(node_id) {
         dataType: 'json',
         success: function (data) {
             if (data['status'] == 'success') {
-                 logger(1, 'DEBUG: got node(s) interfaces from lab "' + lab_filename + '".');
-                deferred.resolve(data['data']);
+                 logger(1, 'DEBUG: got node(s) from lab "' + lab_filename + '".');
+		deferred.resolve(data['data']);
             } else {
                 // Application error
                 logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -1805,42 +1805,6 @@ function addCapture(nodeName,intName){
 
 }
 
-//disconnect interface from node e.g. pnet or bridge
-function disconnectNodeInterface(node_id,interface_id){
-    var deferred = $.Deferred();
-    var lab_filename = $('#lab-viewport').attr('data-path');
-    var form_data = {};
-    form_data[interface_id] = interface_id;
-    var url = '/api/labs' + lab_filename + '/nodes/' + node_id +'/interfaces';
-    var type = 'DELETE';
-    $.ajax({
-        cache: false,
-        timeout: TIMEOUT,
-        type: type,
-        url: encodeURI(url),
-        dataType: 'json',
-        data: JSON.stringify(form_data),
-        success: function (data) {
-            if (data['status'] == 'success') {
-                logger(1, 'DEBUG: node interface deleted from ovs.');
-                deferred.resolve(data);
-            } else {
-                // Application error
-                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
-                deferred.reject(data['message']);
-            }
-        },
-        error: function (data) {
-            // Server error
-            var message = getJsonMessage(data['responseText']);
-            logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
-            logger(1, 'DEBUG: ' + message);
-            deferred.reject(message);
-        }
-    });
-    return deferred.promise();
-}
-
 //set node interface
 function setNodeInterface(node_id,network_id,interface_id){
 
@@ -2376,6 +2340,16 @@ function printFormNode(action, values, fromNodeList) {
                             });
                             html_data += '</select>';
                             html_data += '</div>';
+			    } else if ( value['type'] == 'checkbox') {
+                                if(key == 'cpulimit') {
+                                        widthClass = ' col-sm-2 ';
+                                        html_data += '<div class="'+widthClass+'" style="padding-right: 0px;">'+
+                                        '<label class="control-label" style="height: 34px;margin-top: 8px;margin-bottom: 0px;">' + value['name'] + '</label>'+
+                                        '</div><div class="form-group col-sm-8" style="padding-left: 0px;" >'+
+                                        '<input type="checkbox"  style="width: 34px;" class="form-control" value='+ values['cpulimit']  +' name="node[' + key + ']" '+ (( values['cpulimit'] == 1) ? 'checked' : '' ) +'/>'+
+                                        '</div>';
+                                }
+
                         } else {
                             // Option is standard
                             var widthClass = ' col-sm-12 '
@@ -3462,7 +3436,7 @@ function printLabTopology() {
                         if (destination.substr(0, 7) == 'network') {
                               $.when( getNodeInterfaces(source.replace('node',''))).done( function ( ifaces ) {
                                   for ( ikey in ifaces['ethernet'] ) {
-                                      if ( ifaces['ethernet'][ikey]['color'] == source_label ) {
+                                      if ( ifaces['ethernet'][ikey]['name'] == source_label ) {
                                          tmp_conn.id = 'iface:'+source+":"+ikey
                                       }
                                   }
@@ -3668,7 +3642,9 @@ function createNodeListRow(template, id){
         var readonlyAttr = "";
         var value_name      = node_values['name'];
         var value_cpu       = node_values['cpu'] || "n/a";
-        var value_idlepc    = node_values['idlepc'] || "n/a";
+        var value_cpulimit       = node_values['cpulimit'] ;
+        if ( value_cpulimit == undefined )  value_cpulimit = "n/a";
+	var value_idlepc    = node_values['idlepc'] || "n/a";
         var value_nvram     = node_values['nvram'] || "n/a";
         var value_ram       = node_values['ram'] || "n/a";
         var value_ethernet  = node_values['ethernet'] || "n/a";
@@ -3724,6 +3700,11 @@ function createNodeListRow(template, id){
         //node cpu
         readonlyAttr = (value_cpu && value_cpu != "n/a") ? "" : "readonly";
         html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + ' ' + userRight + '" data-path="' + id + '" name="node[cpu]" value="' + value_cpu + '" type="text" ' + readonlyAttr + ' ' + disabledAttr + ' /></td>';
+	
+	//node cpu limit
+        readonlyAttr = (value_cpulimit != "n/a") ? "" : "readonly";
+        html_data += '<td><input class="configured-nodes-checkbox short-input ' + readonlyAttr + ' ' + userRight + '" data-path="' + id + '" name="node[cpulimit]" value="' + value_cpulimit + '" type="' + ((value_cpulimit == "n/a" ) ? 'input' :'checkbox')  + '" ' + readonlyAttr + ' ' + disabledAttr + ' '+ ( (value_cpulimit == 1) ? 'checked' : '' ) +'/></td>';
+
 
         //node idle
         readonlyAttr = (value_idlepc && value_idlepc != "n/a") ? "" : "readonly";
@@ -3813,14 +3794,15 @@ function createNodeListRow(template, id){
 // Display all nodes in a table
 function printListNodes(nodes) {
     logger(1, 'DEBUG: printing node list');
-    var body = '<div class="table-responsive"><form id="form-node-edit-table" ><table class="configured-nodes table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[111] + '</th><th>' + MESSAGES[163] + '</th><th>' + MESSAGES[105] + '</th><th>' + MESSAGES[106] + '</th><th>' + MESSAGES[107] + '</th><th>' + MESSAGES[108] + '</th><th>' + MESSAGES[109] + '</th><th>' + MESSAGES[110] + '</th><th>' + MESSAGES[112] + '</th><th>' + MESSAGES[164] + '</th><th>' + MESSAGES[123] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
+    var body = '<div class="table-responsive"><form id="form-node-edit-table" ><table class="configured-nodes table"><thead><tr><th>' + MESSAGES[92] + '</th><th>' + MESSAGES[19] + '</th><th>' + MESSAGES[111] + '</th><th>' + MESSAGES[163] + '</th><th>' + MESSAGES[105] + '</th><th>' + MESSAGES[203] + '</th><th>' + MESSAGES[106] + '</th><th>'+ MESSAGES[107] + '</th><th>' + MESSAGES[108] + '</th><th>' + MESSAGES[109] + '</th><th>' + MESSAGES[110] + '</th><th>' + MESSAGES[112] + '</th><th>' + MESSAGES[164] + '</th><th>' + MESSAGES[123] + '</th><th>' + MESSAGES[99] + '</th></tr></thead><tbody>';
     var html_rows = [];
     var promises = [];
 
     var composePromise = function (key, value) {
         var defer = $.Deferred();
         var cpu = (value['cpu'] != null) ? value['cpu'] : '';
-        var ethernet = (value['ethernet'] != null) ? value['ethernet'] : '';
+        var cpulimit = (value['cpulimit'] != null) ? value['cpulimit'] : '';
+	var ethernet = (value['ethernet'] != null) ? value['ethernet'] : '';
         var idlepc = (value['idlepc'] != null) ? value['idlepc'] : '';
         var image = (value['image'] != null) ? value['image'] : '';
         var nvram = (value['nvram'] != null) ? value['nvram'] : '';
@@ -4723,16 +4705,19 @@ function textObjectResize(event, ui, shape_options) {
 }
 // Edit Form: Link
 function printFormEditLink(id) {
-    
- var html = '<form id="addConn" class="addConn-form">' +
+ //var node_int = array();
+ node_int=id.split(':')
+ var node_id = node_int[1].replace("node", "");   
+ var html = '<form id="editConn" class="editConn-form">' +
         '<div class="row">' +
         '<div class="col-md-8 col-md-offset-1 form-group">' +
         '<label class="col-md-3 control-label form-group-addon">Link Color</label>' +
         '<div class="col-md-5">' +
+	 '<input type="hidden" name="node_id" value="'+node_id+'">' +
         '<input type="color" class="form-control link_color">' +
         '</div>' +
         '</div> <br>' +
-        '<button type="submit" class="btn btn-success col-md-offset-1">' + MESSAGES[47] + '</button>' +
+        '<button type="submit" class="btn btn-success">' + MESSAGES[47] + '</button>' +
         '<button type="button" class="btn" data-dismiss="modal">' + MESSAGES[18] + '</button>' +
         '</div>' +
         '<input  type="text" class="hide left-coordinate" value="100">' +
@@ -5289,7 +5274,7 @@ function newConnModal(info , oe ) {
                        linktargetdata['interfaces'] = tmp_interfaces
                   }
                   if ( linktargetdata['selectedif'] == '' ) linktargetdata['selectedif'] = 0 ;
-                  //if ( linksourcedata['status'] == 2 || linktargetdata['status'] == 2 ) { lab_topology.detach( info.connection ) ; return }
+                  if ( linksourcedata['status'] == 2 || linktargetdata['status'] == 2 ) { lab_topology.detach( info.connection ) ; return }
                   window.tmpconn = info.connection
                   html = '<form id="addConn" class="addConn-form">' +
                            '<input type="hidden" name="addConn[srcNodeId]" value="'+linksourcedata['id']+'">' +

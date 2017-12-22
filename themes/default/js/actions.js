@@ -334,7 +334,7 @@ $(document).on('contextmenu', '#lab-viewport', function (e) {
            if (ROLE == "user" || LOCK == 1 ) return;
            body = '';
            body += '<li><a class="action-conndelete" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> Delete</a></li>';
- 	   body += '<li><a class="action-edit-link" href="javascript:void(0)">Edit</a></li>';
+ 	   body += '<li><a class="action-edit-link" href="javascript:void(0)"><i class="glyphicon glyphicon-edit"></i> Edit</a></li>';
 	   printContextMenu('Connection', body, e.pageX, e.pageY,false,"menu");
            return;
     }
@@ -795,7 +795,7 @@ $(document).on('click', '.action-conndelete', function (e) {
      if ( id.search('iface') != -1 ) { // serial or network
         node=id.replace('iface:node','').replace(/:.*/,'') 
         iface=id.replace(/.*:/,'')
-	$.when(disconnectNodeInterface(node, iface)).done( function () {
+	 $.when(setNodeInterface(node,'', iface)).done( function () {
            $('.action-labtopologyrefresh').click();
         }).fail(function (message) {
            addModalError(message);
@@ -2329,6 +2329,50 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function (e) {
     return false;  // Stop to avoid POST
 });
 
+
+// change interface color
+$(document).on('submit', '#editConn', function (e) {
+    e.preventDefault();  // Prevent default behaviour
+    var lab_filename = $('#lab-viewport').attr('data-path');
+    var form_data = form2Array('interfc');
+    var node_id = $('form :input[name="node_id"]').val();
+    var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/interfaces';
+    var type = 'PUT';
+    $.ajax({
+        cache: false,
+        timeout: TIMEOUT,
+        type: type,
+        url: encodeURI(url),
+        dataType: 'json',
+        data: JSON.stringify(form_data),
+        success: function (data) {
+            if (data['status'] == 'success') {
+                logger(1, 'DEBUG: color for interface node "' + node_id + '" saved.');
+                // Close the modal
+                $('body').children('.modal').attr('skipRedraw', true);
+                $('body').children('.modal.second-win').modal('hide');
+                $('body').children('.modal.fade.in').focus();
+                addMessage(data['status'], data['message']);
+                printLabTopology();
+            } else {
+                // Application error
+                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                addModal('ERROR', '<p>' + data['message'] + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+            }
+        },
+        error: function (data) {
+            // Server error
+            var message = getJsonMessage(data['responseText']);
+            logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+            logger(1, 'DEBUG: ' + message);
+            addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
+        }
+    });
+});
+
+
+
+
 // Submit network form
 $(document).on('submit', '#form-network-add, #form-network-edit', function (e) {
     e.preventDefault();  // Prevent default behaviour
@@ -2401,6 +2445,8 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function (e) {
     });
     return false;  // Stop to avoid POST
 });
+
+
 
 // Submit node interfaces form
 $(document).on('submit', '#form-node-connect', function (e) {
@@ -3023,77 +3069,6 @@ $('body').on('submit', '.custom-shape-form', function (e) {
     // Stop or form will follow the action link
     return false;
 });
-// Edit link color
-$('body').on('submit', '.edit-link-form', function (e) {
-    var text_options = {}
-        , text_html
-        , coordinates
-        , z_index = 1001
-        , text_style = ''
-        , customShape_id = ''
-        , form_data = {}
-        ;
-
-    text_options['id'] = new Date().getTime();
-
-    text_options['color'] = $('.add-text-form .text_font_color').val();
-
-    coordinates = 'position:absolute;left:' + resolveZoom(text_options['text_left_coordinate'], 'left') + 'px;top:' + resolveZoom(text_options['text_top_coordinate'], 'top') + 'px;';
-
-    text_html =
-      '<div id="customText' + text_options['id'] + '" class="customShape customText context-menu" data-path="' + customShape_id + '" ' +
-        'style="display:inline;' + coordinates + ' cursor:move; ;z-index:' + z_index + ';" >' +
-        '<p align="' + text_options['alignment'] + '" style="' +
-        'vertical-align:' + text_options['vertical-alignment'] + ';' +
-        'color:' + text_options['color'] + ';' +
-        'background-color:' + text_options['background-color'] + ';' +
-        'font-size:' + text_options['text-size'] + 'px;' +
-        text_style + '">' +
-        text_options['text'] +
-        '</p>' +
-        '</div>';
-
-    form_data['data'] = text_html;
-    form_data['name'] = "txt " + ($(".customShape").length + 1);
-    form_data['type'] = "text";
-
-    createTextObject(form_data).done(function (data) {
-        $('#lab-viewport').prepend(text_html);
-
-        var $added_shape = $("#customText" + text_options['id']);
-        $added_shape
-            .resizable({
-                autoHide: true,
-                resize: function (event, ui) {
-                    textObjectResize(event, ui, text_options);
-                },
-                stop: textObjectDragStop
-            });
-
-        getTextObjects().done(function (textObjects) {
-            var id = data.id;
-            $added_shape.attr("id", "customText" + id);
-            $added_shape.attr("data-path", id);
-  if ($("#customText" + id).length > 1) {
-                addMessage('warning', MESSAGES[156]);
-                printLabTopology();
-            }
-
-            // Hide and delete the modal (or will be posted twice)
-            $('body').children('.modal').modal('hide');
-            printLabTopology();
-        }).fail(function (message) {
-            addMessage('DANGER', getJsonMessage(message));
-        });
-    }).done(function () {
-        addMessage('SUCCESS', 'Lab has been saved (60023).');
-    }).fail(function (message) {
-        addMessage('DANGER', getJsonMessage(message));
-    });
-
-    return false;
-});
-
 // Add Text
 $('body').on('submit', '.add-text-form', function (e) {
     var text_options = {}
@@ -3412,12 +3387,20 @@ $('body').on('click', '.action-textobjecttofront', function (e) {
     $('#context-menu').remove();
 });
 
-//added function for editing connections
+// Function for editing connections
 $('body').on('click', '.action-edit-link', function (e) {
-    logger(1, 'DEBUG: action = action-edit-link');
-    var id = $(this).attr('data-path');
+  var id = window.connToDel.id
+     window.connContext = 0  
+  	if ( id.search('iface') != -1 ) { // serial or network
+	 network_id=id.replace(/.*:/,'')
+	} else {  
+ 	 network_id = id.replace('network_id:','')
+	}
+  //var id = $(this).attr('data-path');
+ logger(1, 'DEBUG: action = '+ id + ' action-edit-link');
 
         printFormEditLink(id);
+
     $('#context-menu').remove();
 });
 

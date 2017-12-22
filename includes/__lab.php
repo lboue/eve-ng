@@ -42,13 +42,14 @@ class Lab {
 	private $scripttimeout;
 	private $lock;
 
-	/**
-	 * Constructor which load an existent lab or create an empty one.
-	 *
-	 * @param	  string  $f                  the file of the lab with full path
-	 * @param	  int     $tenant             Tenant ID
-	 * @return	  void
-	 */
+    /**
+     * Constructor which load an existent lab or create an empty one.
+     *
+     * @param      string $f the file of the lab with full path
+     * @param      int $tenant Tenant ID
+     * @throws     Exception
+     * @return     void
+     */
 	public function __construct($f, $tenant) {
 		$modified = False;
 
@@ -454,7 +455,7 @@ class Lab {
 	 * Method to add a new text object.
 	 *
 	 * @param   Array   $p                  Parameters
-	 * @return	int	                        0 if OK
+	 * @return	Array	id,status
 	 */
 	public function addTextObject($p) {
 		$p['id'] = 1;
@@ -896,11 +897,14 @@ class Lab {
 			return Array();
 		}
 	}
-	 /**
-         * Method to get all ethernets for all nodes
-         *
-         * @return  Array                       Lab ethernets all
-         */
+
+    /**
+     * Method to get all ethernets for all nodes
+     *
+     * @param $id
+     * @param $p
+     * @return  Array                       Lab ethernets all
+     */
      	public function getNodesEthernets($id,$p) {
 		$ethernetsarray=array();
 		$node =  $this -> nodes[$id];
@@ -1294,7 +1298,8 @@ public function disconnectNodeInterface($id,$interface_id) {
 							$e -> addAttribute('id', $interface_id);
 							$e -> addAttribute('name', $interface -> getName());
 							$e -> addAttribute('type', $interface -> getNType());
-							$e -> addAttribute('network_id', $interface -> getNetworkId());
+                            $e -> addAttribute('color', $interface -> getInterfaceColor());
+                            $e -> addAttribute('network_id', $interface -> getNetworkId());
 						}
 					}
 
