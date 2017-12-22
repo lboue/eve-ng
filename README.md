@@ -3,7 +3,7 @@ This is an EVE-NG fork of just the html directory to add functionality.
 
 Fucntionality is currently incomplete, use at own risk.
 ## Installation
-Installation can be done ontop of an existing 2.0.79 EVE-NG install with the following
+Installation can be done ontop of an existing 2.0.86 EVE-NG install with the following
 
 ```
 cd  /opt/unetlab
