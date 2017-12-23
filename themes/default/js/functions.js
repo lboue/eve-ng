@@ -3410,8 +3410,8 @@ function printLabTopology() {
                             src_label.push({
                                 label: source_label,
                                 location: 0.15,
-                                cssClass: 'node_interface ' + source + ' ' + destination,
-                                paintStyle: {strokeWidth: 2, stroke: link_color + ''}
+                                cssClass: 'node_interface',
+                                labelStyle: {borderWidth: 2, borderStyle: link_color + ''}
                             });
                         } else {
                             src_label.push(Object());
@@ -3420,8 +3420,8 @@ function printLabTopology() {
                             dst_label.push({
                                 label: destination_label,
                                 location: 0.85,
-                                cssClass: 'node_interface ' + source + ' ' + destination,
-                                paintStyle: {strokeWidth: 2, stroke: link_color + ''}
+                                cssClass: 'node_interface',
+                                labelStyle: {borderWidth: 2, borderStyle: link_color + ''}
                             });
                         } else {
                             dst_label.push(Object());

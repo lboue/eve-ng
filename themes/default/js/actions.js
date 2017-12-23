@@ -181,7 +181,6 @@ function ObjectPosUpdate (event ,ui) {
      }
      window.dragstop = 0;
      var zoom = $('#zoomslide').slider("value")/100 ;
-
      if ( groupMove.length > 1 ) window.dragstop = 1 
      if ( event.metaKey || event.e.metaKey || event.ctrlKey || event.e.ctrlKey  ) return
      window.moveCount += 1
@@ -194,8 +193,7 @@ function ObjectPosUpdate (event ,ui) {
           eLeft = Math.round($('#'+node.id).position().left / zoom + $('#lab-viewport').scrollLeft());
           //eTop = Math.round(node.offsetTop + $('#lab-viewport').scrollTop())
           eTop = Math.round($('#'+node.id).position().top / zoom + $('#lab-viewport').scrollTop());
- 
-	 id = node.id
+          id = node.id
           $('#'+id).addClass('dragstopped')
           if ( id.search('node') != -1 ) {
                logger(1, 'DEBUG: setting' + id + ' position.');
@@ -334,8 +332,8 @@ $(document).on('contextmenu', '#lab-viewport', function (e) {
            if (ROLE == "user" || LOCK == 1 ) return;
            body = '';
            body += '<li><a class="action-conndelete" href="javascript:void(0)"><i class="glyphicon glyphicon-trash"></i> Delete</a></li>';
- 	   body += '<li><a class="action-edit-link" href="javascript:void(0)"><i class="glyphicon glyphicon-edit"></i> Edit</a></li>';
-	   printContextMenu('Connection', body, e.pageX, e.pageY,false,"menu");
+           body += '<li><a class="action-edit-link" href="javascript:void(0)"><i class="glyphicon glyphicon-edit"></i> Edit</a></li>';
+           printContextMenu('Connection', body, e.pageX, e.pageY,false,"menu");
            return;
     }
 
@@ -377,6 +375,7 @@ $(document).on('contextmenu', '.context-menu', function (e) {
  
     if ($(this).hasClass('node_frame')) {
         logger(1, 'DEBUG: opening node context menu');
+
     var node_name = $(this).attr('data-name');
     var node_id = $(this).attr('data-path');
     if(parseInt($('#node'+node_id).attr('data-status')) != 2){
@@ -2427,7 +2426,7 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function (e) {
                     
                     // Close the modal
                     $('body').children('.modal').attr('skipRedraw', true);
-                    $('body').children('.modal-dialog').modal('hide');
+                    $('body').children('.modal.second-win').modal('hide');
                     $('body').children('.modal.fade.in').focus();
                     addMessage(data['status'], data['message']);
                 } else {
@@ -2452,8 +2451,6 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function (e) {
     });
     return false;  // Stop to avoid POST
 });
-
-
 
 // Submit node interfaces form
 $(document).on('submit', '#form-node-connect', function (e) {
@@ -2697,6 +2694,8 @@ $(document).on('focusout', '.configured-nodes-input', function(e){
         setNodeData(id);
     }
 });
+
+
 
 
 $(document).on('focusout', '.configured-nods-select', function(e){
@@ -3076,6 +3075,7 @@ $('body').on('submit', '.custom-shape-form', function (e) {
     // Stop or form will follow the action link
     return false;
 });
+
 // Add Text
 $('body').on('submit', '.add-text-form', function (e) {
     var text_options = {}
@@ -3395,6 +3395,7 @@ $('body').on('click', '.action-textobjecttofront', function (e) {
 });
 
 // Function for editing connections
+// TODO: add code to take network_id and get network interfaces
 $('body').on('click', '.action-edit-link', function (e) {
   var id = window.connToDel.id
      window.connContext = 0  
@@ -3405,9 +3406,7 @@ $('body').on('click', '.action-edit-link', function (e) {
 	}
   //var id = $(this).attr('data-path');
  logger(1, 'DEBUG: action = '+ id + ' action-edit-link');
-
         printFormEditLink(id);
-
     $('#context-menu').remove();
 });
 
@@ -4269,4 +4268,18 @@ $(document).on('submit', '#form-upload-node-config', function (e) {
      };
      reader.readAsText(node_config);
      $('.upload-modal').modal('hide');
+});
+
+// Generic Toggle Checknox
+$(document).on('click','input[type=checkbox]', function (e) {
+    if ( e.currentTarget.value == 0 ) {
+        e.currentTarget.value = 1;
+    } else {
+        e.currentTarget.value = 0;
+    }
+});
+
+$(document).on('click', '.configured-nodes-checkbox', function(e){
+    var id = $(this).attr('data-path')
+    setNodeData(id);
 });
