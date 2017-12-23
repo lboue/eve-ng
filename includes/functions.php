@@ -607,8 +607,8 @@ function listClouds() {
 function listRoles() {
 	$results = Array();
 	$results['admin'] = 'Administrator';
-	//$results['editor'] = 'Editor';
-	//$results['user'] = 'User';
+	$results['editor'] = 'Editor';
+	$results['user'] = 'User';
 	return $results;
 }
 

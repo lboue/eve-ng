@@ -2334,9 +2334,16 @@ $(document).on('submit', '#form-lab-add, #form-lab-edit', function (e) {
 $(document).on('submit', '#editConn', function (e) {
     e.preventDefault();  // Prevent default behaviour
     var lab_filename = $('#lab-viewport').attr('data-path');
-    var form_data = form2Array('interfc');
-    var node_id = $('form :input[name="node_id"]').val();
-    var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/interfaces';
+   // var form_data2 = form2Array(this);
+    var form_data = {};
+    var promises = [];
+    var node_id = this[0].value
+    var interface_color = this[2].value
+    var node_interface = this[1].value
+    form_data['nodeId'] = node_id
+    form_data['color'] = interface_color
+    form_data['interfaceId'] = node_interface
+    var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/interface/color';
     var type = 'PUT';
     $.ajax({
         cache: false,
@@ -2349,10 +2356,9 @@ $(document).on('submit', '#editConn', function (e) {
             if (data['status'] == 'success') {
                 logger(1, 'DEBUG: color for interface node "' + node_id + '" saved.');
                 // Close the modal
-                $('body').children('.modal').attr('skipRedraw', true);
-                $('body').children('.modal.second-win').modal('hide');
-                $('body').children('.modal.fade.in').focus();
                 addMessage(data['status'], data['message']);
+                $(e.target).parents('.modal').attr('skipRedraw', true);
+                $(e.target).parents('.modal').modal('hide');
                 printLabTopology();
             } else {
                 // Application error
@@ -2368,6 +2374,7 @@ $(document).on('submit', '#editConn', function (e) {
             addModal('ERROR', '<p>' + message + '</p>', '<button type="button" class="btn btn-aqua" data-dismiss="modal">Close</button>');
         }
     });
+    return false;  // Stop to avoid POST
 });
 
 
@@ -2420,7 +2427,7 @@ $(document).on('submit', '#form-network-add, #form-network-edit', function (e) {
                     
                     // Close the modal
                     $('body').children('.modal').attr('skipRedraw', true);
-                    $('body').children('.modal.second-win').modal('hide');
+                    $('body').children('.modal-dialog').modal('hide');
                     $('body').children('.modal.fade.in').focus();
                     addMessage(data['status'], data['message']);
                 } else {

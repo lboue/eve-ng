@@ -3326,7 +3326,7 @@ function printLabTopology() {
                 lab_topology.setContainer($("#lab-viewport"));
                 lab_topology.importDefaults({
                     Anchor: 'Continuous',
-                    Connector: ['Bezier'],
+                    Connector: ['Straight'],
                     Endpoint: 'Blank',
                     PaintStyle: {strokeWidth: 2, stroke: '#c00001'},
                     cssClass: 'link'
@@ -3399,7 +3399,7 @@ function printLabTopology() {
                     var type = link['type'],
                         source = link['source'],
                         source_label = link['source_label'],
-			link_color = link['link_color'],
+			            link_color = link['link_color'],
                         destination = link['destination'],
                         destination_label = link['destination_label'],
                         src_label = ["Label"],
@@ -3409,8 +3409,9 @@ function printLabTopology() {
                         if (source_label != '') {
                             src_label.push({
                                 label: source_label,
-                                location: 0.07,
-                                cssClass: 'node_interface ' + source + ' ' + destination
+                                location: 0.15,
+                                cssClass: 'node_interface ' + source + ' ' + destination,
+                                paintStyle: {strokeWidth: 2, stroke: link_color + ''}
                             });
                         } else {
                             src_label.push(Object());
@@ -3418,8 +3419,9 @@ function printLabTopology() {
                         if (destination_label != '') {
                             dst_label.push({
                                 label: destination_label,
-                                location: 0.93,
-                                cssClass: 'node_interface ' + source + ' ' + destination
+                                location: 0.85,
+                                cssClass: 'node_interface ' + source + ' ' + destination,
+                                paintStyle: {strokeWidth: 2, stroke: link_color + ''}
                             });
                         } else {
                             dst_label.push(Object());
@@ -3430,7 +3432,7 @@ function printLabTopology() {
                             source: source,       // Must attach to the IMG's parent or not printed correctly
                             target: destination,  // Must attach to the IMG's parent or not printed correctly
                             cssClass: source + ' ' + destination + ' frame_ethernet',
-                            paintStyle: {strokeWidth: 2, stroke: '#' + link_color + ''},
+                            paintStyle: {strokeWidth: 2, stroke: link_color + ''},
                             overlays: [src_label, dst_label]
                         });
                         if (destination.substr(0, 7) == 'network') {
@@ -3448,7 +3450,7 @@ function printLabTopology() {
                         src_label.push({
                             label: source_label,
                             location: 0.15,
-                            cssClass: 'node_interface ' + source + ' ' + destination
+                            cssClass: 'node_interface ' + source + ' ' + destination,
                         });
                         dst_label.push({
                             label: destination_label,
@@ -4707,27 +4709,30 @@ function textObjectResize(event, ui, shape_options) {
 function printFormEditLink(id) {
  //var node_int = array();
  node_int=id.split(':')
- var node_id = node_int[1].replace("node", "");   
+ var node_id = node_int[1].replace("node", "");
+ var node_interface = node_int[2].replace("node", "");
  var html = '<form id="editConn" class="editConn-form">' +
         '<div class="row">' +
         '<div class="col-md-8 col-md-offset-1 form-group">' +
         '<label class="col-md-3 control-label form-group-addon">Link Color</label>' +
         '<div class="col-md-5">' +
-	 '<input type="hidden" name="node_id" value="'+node_id+'">' +
-        '<input type="color" class="form-control link_color">' +
+	    '<input type="hidden" name="node_id" value="'+node_id+'">' +
+        '<input type="hidden" name="node_interface" value="'+node_interface+'">' +
+        '<input type="input" name="color" class="form-control link_color">' +
         '</div>' +
         '</div> <br>' +
         '<button type="submit" class="btn btn-success">' + MESSAGES[47] + '</button>' +
         '<button type="button" class="btn" data-dismiss="modal">' + MESSAGES[18] + '</button>' +
         '</div>' +
-        '<input  type="text" class="hide left-coordinate" value="100">' +
-        '<input  type="text" class="hide top-coordinate" value="100">' +
         '</form>';
 
- 
+    addModal("Edit-Link", html, '','','edit-link');
 
+    $('input.link_color').colorpicker({
+        color: "#000000",
+        defaultPalette: 'web'
+    })
 
-addModal("Edit Link Color", html, '');
  $('#body').append(html);
 }
 

@@ -3292,5 +3292,18 @@ class Node {
 		error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][40018]);
 		return 40018;
 	}
+    /**
+     * Method to unlink an interface.
+     *
+     * @param   int     $i                  Interface ID
+     * @return  int                         0 means ok
+     */
+    public function editInterfaceColor($i) {
+        $interfaceId = $i['interfaceId'];
+        // Ethernet interface
+        if (isset($this -> ethernets[$interfaceId])) {
+            return $this -> ethernets[$interfaceId] -> edit(Array('color' => $i['color']));
+        }
+    }
 }
 ?>

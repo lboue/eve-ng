@@ -678,7 +678,18 @@ class Lab {
 			return 20030;
 		}
 	}
-
+    /**
+     * Method to edit an interfaceColor
+     *
+     * @param   Array   $p                  Parameters
+     * @return	int	                        0 if OK
+     */
+    public function editInterfaceColor($p) {
+        $id = $p['nodeId'];
+        if ($this->nodes[$id]->editInterfaceColor($p) === 0) {
+            return $this->save();
+        }
+    }
 	/**
 	 * Method to edit a network.
 	 *
@@ -747,6 +758,7 @@ class Lab {
 			return False;
 		}
 	}
+
 
 	/**
 	 * Method to edit a picture.

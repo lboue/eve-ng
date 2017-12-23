@@ -286,6 +286,29 @@ function apiEditLabNodeInterfaces($lab, $id, $p) {
 	}
 	return $output;
 }
+/*
+ * Function to get a single lab node.
+ *
+ * @param   Lab     $lab                Lab
+ * @param   int     $id                 Node ID
+ * @param   Array   $p                  Parameters
+ * @return  Array                       Lab node (JSend data)
+ */
+function apiEditLabNodeInterfaceColor($lab, $id, $p) {
+    $rc = $lab -> editInterfaceColor($p);
+
+    if ($rc === 0) {
+        $output['code'] = 201;
+        $output['status'] = 'success';
+        $output['message'] = $GLOBALS['messages'][60023];
+    } else {
+        $output['code'] = 400;
+        $output['status'] = 'fail';
+        $output['message'] = $GLOBALS['messages'][$rc];
+    }
+    return $output;
+}
+
 
 /**
  * Function to get a single lab node.

@@ -248,19 +248,19 @@ class Interfc {
 
 
 
-        /**
-         * Method to get interface color.
-         *
-         * @return      string                      Interface color
-         */
-        public function getInterfaceColor() {
+     /**
+	  * Method to get interface color.
+	  *
+	  * @return      string                      Interface color
+	  */
+     public function getInterfaceColor() {
 		if (isset($this -> color)) {
                 	return $this -> color;
 		}
 		else {
-		return "0066aa";
+			return "#0066aa";
 		}
-        }
+     }
 
 	/**
 	 * Method to get interface type.
