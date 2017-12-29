@@ -1761,9 +1761,6 @@ function setNodeData(id){
     return false;
 }
 
-
-
-
 // Attach network to capture node
 function addCapture(nodeName,intName){
 
@@ -1860,8 +1857,7 @@ function start(node_id) {
             if (data['status'] == 'success') {
                 logger(1, 'DEBUG: node(s) started.');
                 //$('#node' + node_id + ' img').removeClass('grayscale')
-               
-		 deferred.resolve(data['data']);
+		        deferred.resolve(data['data']);
             } else {
                 // Application error
                 logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
@@ -2349,7 +2345,6 @@ function printFormNode(action, values, fromNodeList) {
                                         '<input type="checkbox"  style="width: 34px;" class="form-control" value='+ values['cpulimit']  +' name="node[' + key + ']" '+ (( values['cpulimit'] == 1) ? 'checked' : '' ) +'/>'+
                                         '</div>';
                                 }
-
                         } else {
                             // Option is standard
                             var widthClass = ' col-sm-12 '
@@ -3079,7 +3074,7 @@ function updateFreeSelect ( e , ui ) {
     $('.node_frame.ui-selected, node_frame.ui-selecting').addClass('free-selected')
     $('.node_frame.ui-selected, .node_frame.ui-selecting').each(function() {
          window.freeSelectedNodes.push({ name: $(this).data("name") , path: $(this).data("path") , type: 'node'  });
-         
+
     });
 }
 
@@ -3435,7 +3430,7 @@ function printLabTopology() {
                             paintStyle: {strokeWidth: 2, stroke: link_color + ''},
                             overlays: [src_label, dst_label]
                         });
-                        if (destination.substr(0, 7) == 'network') {
+                     
                               $.when( getNodeInterfaces(source.replace('node',''))).done( function ( ifaces ) {
                                   for ( ikey in ifaces['ethernet'] ) {
                                       if ( ifaces['ethernet'][ikey]['name'] == source_label ) {
@@ -3443,9 +3438,7 @@ function printLabTopology() {
                                       }
                                   }
                               });
-                        } else {
-                              tmp_conn.id = 'network_id:'+link['network_id']
-                        }
+
                     } else {
                         src_label.push({
                             label: source_label,
@@ -3702,11 +3695,9 @@ function createNodeListRow(template, id){
         //node cpu
         readonlyAttr = (value_cpu && value_cpu != "n/a") ? "" : "readonly";
         html_data += '<td><input class="configured-nodes-input short-input ' + readonlyAttr + ' ' + userRight + '" data-path="' + id + '" name="node[cpu]" value="' + value_cpu + '" type="text" ' + readonlyAttr + ' ' + disabledAttr + ' /></td>';
-	
 	//node cpu limit
         readonlyAttr = (value_cpulimit != "n/a") ? "" : "readonly";
         html_data += '<td><input class="configured-nodes-checkbox short-input ' + readonlyAttr + ' ' + userRight + '" data-path="' + id + '" name="node[cpulimit]" value="' + value_cpulimit + '" type="' + ((value_cpulimit == "n/a" ) ? 'input' :'checkbox')  + '" ' + readonlyAttr + ' ' + disabledAttr + ' '+ ( (value_cpulimit == 1) ? 'checked' : '' ) +'/></td>';
-
 
         //node idle
         readonlyAttr = (value_idlepc && value_idlepc != "n/a") ? "" : "readonly";
