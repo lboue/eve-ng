@@ -794,7 +794,7 @@ $(document).on('click', '.action-conndelete', function (e) {
      if ( id.search('iface') != -1 ) { // serial or network
         node=id.replace('iface:node','').replace(/:.*/,'') 
         iface=id.replace(/.*:/,'')
-	 $.when(setNodeInterface(node,'', iface)).done( function () {
+	 $.when(delNodeInterface(node,'', iface)).done( function () {
            $('.action-labtopologyrefresh').click();
         }).fail(function (message) {
            addModalError(message);
@@ -809,6 +809,7 @@ $(document).on('click', '.action-conndelete', function (e) {
         });
      }
      $('#context-menu').remove();
+
 });
 
 $(document).on('contextmenu', '.map_mark', function (e) {
@@ -2335,7 +2336,6 @@ $(document).on('submit', '#editConn', function (e) {
     var lab_filename = $('#lab-viewport').attr('data-path');
    // var form_data2 = form2Array(this);
     var form_data = {};
-    var promises = [];
     var node_id = this[0].value
     var interface_color = this[2].value
     var node_interface = this[1].value

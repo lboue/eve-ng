@@ -1841,6 +1841,45 @@ function setNodeInterface(node_id,network_id,interface_id){
 
 }
 
+//set node interface
+function delNodeInterface(node_id,network_id,interface_id){
+
+    var deferred = $.Deferred();
+    var lab_filename = $('#lab-viewport').attr('data-path');
+    var form_data = {};
+    form_data[interface_id] = network_id;
+
+    var url = '/api/labs' + lab_filename + '/nodes/' + node_id +'/interfaces';
+    var type = 'DELETE';
+    $.ajax({
+        cache: false,
+        timeout: TIMEOUT,
+        type: type,
+        url: encodeURI(url),
+        dataType: 'json',
+        data: JSON.stringify(form_data),
+        success: function (data) {
+            if (data['status'] == 'success') {
+                logger(1, 'DEBUG: node interface updated.');
+                deferred.resolve(data);
+            } else {
+                // Application error
+                logger(1, 'DEBUG: application error (' + data['status'] + ') on ' + type + ' ' + url + ' (' + data['message'] + ').');
+                deferred.reject(data['message']);
+            }
+        },
+        error: function (data) {
+            // Server error
+            var message = getJsonMessage(data['responseText']);
+            logger(1, 'DEBUG: server error (' + data['status'] + ') on ' + type + ' ' + url + '.');
+            logger(1, 'DEBUG: ' + message);
+            deferred.reject(message);
+        }
+    });
+    return deferred.promise();
+
+}
+
 // Start node(s)
 function start(node_id) {
     var deferred = $.Deferred();
@@ -3430,7 +3469,7 @@ function printLabTopology() {
                             paintStyle: {strokeWidth: 2, stroke: link_color + ''},
                             overlays: [src_label, dst_label]
                         });
-                     
+                      //todo: we only change the color of the first node in a two node link
                               $.when( getNodeInterfaces(source.replace('node',''))).done( function ( ifaces ) {
                                   for ( ikey in ifaces['ethernet'] ) {
                                       if ( ifaces['ethernet'][ikey]['name'] == source_label ) {
@@ -5270,7 +5309,7 @@ function newConnModal(info , oe ) {
                        linktargetdata['interfaces'] = tmp_interfaces
                   }
                   if ( linktargetdata['selectedif'] == '' ) linktargetdata['selectedif'] = 0 ;
-                  if ( linksourcedata['status'] == 2 || linktargetdata['status'] == 2 ) { lab_topology.detach( info.connection ) ; return }
+                // if ( linksourcedata['status'] == 2 || linktargetdata['status'] == 2 ) { lab_topology.detach( info.connection ) ; return }
                   window.tmpconn = info.connection
                   html = '<form id="addConn" class="addConn-form">' +
                            '<input type="hidden" name="addConn[srcNodeId]" value="'+linksourcedata['id']+'">' +

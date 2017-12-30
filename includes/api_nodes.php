@@ -235,10 +235,10 @@ function apiExportLabNodes($lab, $tenant) {
 function apiDeleteNodeInterface($lab, $id, $p) {
 	$interface_id = "vunl0_".$id."_".key($p);
 	
-	// handles deleted from the OVS
+	// handles deleting from the OVS
 	disconnectNodePort($interface_id);
 	
-	// handes updating the xml
+	// handles updating the xml
 	$rc = $lab ->disconnectNodeInterface($id,key($p));
 
     	if ($rc === 0) {
