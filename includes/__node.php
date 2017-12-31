@@ -3293,7 +3293,7 @@ class Node {
 		return 40018;
 	}
     /**
-     * Method to unlink an interface.
+     * Method to edit interface Color
      *
      * @param   int     $i                  Interface ID
      * @return  int                         0 means ok
@@ -3305,5 +3305,33 @@ class Node {
             return $this -> ethernets[$interfaceId] -> edit(Array('color' => $i['color']));
         }
     }
+
+    /**
+     * Method to edit interface Style
+     *
+     * @param   int     $i                  Interface ID
+     * @return  int                         0 means ok
+     */
+    public function editInterfaceStyle($i) {
+        $interfaceId = $i['interfaceId'];
+        // Ethernet interface
+        if (isset($this -> ethernets[$interfaceId])) {
+            return $this -> ethernets[$interfaceId] -> edit(Array('style' => $i['style']));
+        }
+    }
+    /**
+     * Method to edit interface label
+     *
+     * @param   int     $i                  Interface ID
+     * @return  int                         0 means ok
+     */
+    public function editInterfaceLabel($i) {
+        $interfaceId = $i['interfaceId'];
+        // Ethernet interface
+        if (isset($this -> ethernets[$interfaceId])) {
+            return $this -> ethernets[$interfaceId] -> edit(Array('label' => $i['label']));
+        }
+    }
+
 }
 ?>

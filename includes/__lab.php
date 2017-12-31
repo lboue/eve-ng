@@ -300,6 +300,8 @@ class Lab {
 					if (isset($interface -> attributes() -> id)) $i['id'] = (string) $interface -> attributes() -> id;
 					if (isset($interface -> attributes() -> network_id)) $i['network_id'] = (string) $interface -> attributes() -> network_id;
 					if (isset($interface -> attributes() -> color)) $i['color'] = (string) $interface -> attributes() -> color;
+                    if (isset($interface -> attributes() -> style)) $i['style'] = (string) $interface -> attributes() -> style;
+                    if (isset($interface -> attributes() -> label)) $i['label'] = (string) $interface -> attributes() -> label;
 					if (isset($interface -> attributes() -> remote_id)) $i['remote_id'] = (string) $interface -> attributes() -> remote_id;
 					if (isset($interface -> attributes() -> remote_if)) $i['remote_if'] = (string) $interface -> attributes() -> remote_if;
 					if (isset($interface -> attributes() -> remote_host)) $i['remote_host'] = (string) $interface -> attributes() -> remote_host;
@@ -679,7 +681,7 @@ class Lab {
 		}
 	}
     /**
-     * Method to edit an interfaceColor
+     * Method to edit an interface color
      *
      * @param   Array   $p                  Parameters
      * @return	int	                        0 if OK
@@ -687,6 +689,24 @@ class Lab {
     public function editInterfaceColor($p) {
         $id = $p['nodeId'];
         if ($this->nodes[$id]->editInterfaceColor($p) === 0) {
+            return $this->save();
+        }
+    }
+    /**
+     * Method to edit an interface style
+     *
+     * @param   Array   $p                  Parameters
+     * @return	int	                        0 if OK
+     */
+    public function editInterfaceStyle($p) {
+        $id = $p['nodeId'];
+        if ($this->nodes[$id]->editInterfaceStyle($p) === 0) {
+            return $this->save();
+        }
+    }
+    public function editInterfaceLabel($p) {
+        $id = $p['nodeId'];
+        if ($this->nodes[$id]->editInterfaceLabel($p) === 0) {
             return $this->save();
         }
     }
@@ -1311,6 +1331,8 @@ public function disconnectNodeInterface($id,$interface_id) {
 							$e -> addAttribute('name', $interface -> getName());
 							$e -> addAttribute('type', $interface -> getNType());
                             $e -> addAttribute('color', $interface -> getInterfaceColor());
+                            $e -> addAttribute('style', $interface -> getInterfaceStyle());
+                            $e -> addAttribute('label', $interface -> getInterfaceLabel());
                             $e -> addAttribute('network_id', $interface -> getNetworkId());
 						}
 					}

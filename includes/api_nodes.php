@@ -295,8 +295,10 @@ function apiEditLabNodeInterfaces($lab, $id, $p) {
  * @return  Array                       Lab node (JSend data)
  */
 function apiEditLabNodeInterfaceColor($lab, $id, $p) {
+	//to do refactor in to single
     $rc = $lab -> editInterfaceColor($p);
-
+    $rc = $lab -> editInterfaceStyle($p);
+    $rc = $lab -> editInterfaceLabel($p);
     if ($rc === 0) {
         $output['code'] = 201;
         $output['status'] = 'success';
@@ -568,7 +570,9 @@ function apiGetLabNodeInterfaces($lab, $id) {
 			$ethernets[$interface_id] = Array(
 				'name' => $interface -> getName(),
 				'network_id' => $interface -> getNetworkId(),
-				'color' => $interface -> getInterfaceColor()
+				'color' => $interface -> getInterfaceColor(),
+                'style' => $interface -> getInterfaceStyle(),
+                'label' => $interface -> getInterfaceLabel()
 			);
 		}
 		$serials = Array();

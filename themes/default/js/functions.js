@@ -3305,7 +3305,7 @@ function printLabTopology() {
                     $newTextObject
                         .resizable().resizable("destroy")
                         .resizable({
-                grid:[3,3],
+                grid: [3, 3],
                             autoHide: true,
                             resize: function (event, ui) {
                                 textObjectResize(event, ui, {"shape_border_width": 5});
@@ -3321,7 +3321,7 @@ function printLabTopology() {
                     $newTextObject
                         .resizable().resizable('destroy')
                         .resizable({
-                grid:[3,3],
+                grid: [3, 3],
                             autoHide: true,
                             resize: function (event, ui) {
                                 textObjectResize(event, ui, {"shape_border_width": 5});
@@ -3434,18 +3434,33 @@ function printLabTopology() {
                         source = link['source'],
                         source_label = link['source_label'],
 			            link_color = link['link_color'],
+                        link_style = link['link_style'],
+                        link_label = link['link_label'],
                         destination = link['destination'],
                         destination_label = link['destination_label'],
                         src_label = ["Label"],
+                        lnk_label = ["Label"],
                         dst_label = ["Label"];
 
+
+
                     if (type == 'ethernet') {
+                        if (link_label != '') {
+                            lnk_label.push({
+                                label: link_label,
+                                location: 0.50,
+                                cssClass: 'node_interface',
+                                labelStyle: {borderWidth: 1, borderStyle: link_color + ''}
+                            });
+                        } else {
+                            lnk_label.push(Object());
+                        }
                         if (source_label != '') {
                             src_label.push({
                                 label: source_label,
-                                location: 0.15,
+                                location: 0.10,
                                 cssClass: 'node_interface',
-                                labelStyle: {borderWidth: 2, borderStyle: link_color + ''}
+                                labelStyle: {borderWidth: 1, borderStyle: link_color + ''}
                             });
                         } else {
                             src_label.push(Object());
@@ -3453,9 +3468,9 @@ function printLabTopology() {
                         if (destination_label != '') {
                             dst_label.push({
                                 label: destination_label,
-                                location: 0.85,
+                                location: 0.90,
                                 cssClass: 'node_interface',
-                                labelStyle: {borderWidth: 2, borderStyle: link_color + ''}
+                                labelStyle: {borderWidth: 1, borderStyle: link_color + ''}
                             });
                         } else {
                             dst_label.push(Object());
@@ -3463,11 +3478,12 @@ function printLabTopology() {
 
 
                         var tmp_conn = lab_topology.connect({
+                            connector: [link_style, { curviness: 100 }],
                             source: source,       // Must attach to the IMG's parent or not printed correctly
                             target: destination,  // Must attach to the IMG's parent or not printed correctly
                             cssClass: source + ' ' + destination + ' frame_ethernet',
                             paintStyle: {strokeWidth: 2, stroke: link_color + ''},
-                            overlays: [src_label, dst_label]
+                            overlays: [src_label, dst_label,lnk_label]
                         });
                       //todo: we only change the color of the first node in a two node link
                               $.when( getNodeInterfaces(source.replace('node',''))).done( function ( ifaces ) {
@@ -3501,6 +3517,7 @@ function printLabTopology() {
                                     if ( ifaces['serial'][ikey]['name'] == source_label ) {
                                         tmp_conn.id = 'iface:'+source+':'+ikey
                                     }
+
                              }
                         });
                     }
@@ -3510,7 +3527,7 @@ function printLabTopology() {
                     }
                 });
 
-        printLabStatus();
+                printLabStatus();
 
                 // Remove unused elements
                 $('.unused').remove();
@@ -4740,30 +4757,68 @@ function printFormEditLink(id) {
  //var node_int = array();
  node_int=id.split(':')
  var node_id = node_int[1].replace("node", "");
- var node_interface = node_int[2].replace("node", "");
- var html = '<form id="editConn" class="editConn-form">' +
-        '<div class="row">' +
-        '<div class="col-md-8 col-md-offset-1 form-group">' +
-        '<label class="col-md-3 control-label form-group-addon">Link Color</label>' +
-        '<div class="col-md-5">' +
-	    '<input type="hidden" name="node_id" value="'+node_id+'">' +
-        '<input type="hidden" name="node_interface" value="'+node_interface+'">' +
-        '<input type="input" name="color" class="form-control link_color">' +
-        '</div>' +
-        '</div> <br>' +
-        '<button type="submit" class="btn btn-success">' + MESSAGES[47] + '</button>' +
-        '<button type="button" class="btn" data-dismiss="modal">' + MESSAGES[18] + '</button>' +
-        '</div>' +
-        '</form>';
+ var node_interface = node_int[2];
+    var int_color = '';
+    var int_style = '';
+    var int_label = '';
+    $.when(getNodeInterfaces(node_id)).done(function (ifaces) {
+        for ( ikey in ifaces['ethernet'] ) {
 
-    addModal("Edit-Link", html, '','','edit-link');
+            if ( ikey == node_interface ) {
+                int_color=ifaces['ethernet'][ikey]['color']
+                int_style=ifaces['ethernet'][ikey]['style']
+                int_label=ifaces['ethernet'][ikey]['label']
+            }
+        }
+        var html = '<form id="editConn" class="editConn-form">' +
+            '<div class="row">' +
+            '<div class="col-md-6 form-group">' +
+            '<label class="col-md-6 control-label form-group-addon">Link Color</label>' +
+            '<div class="col-md-5">' +
+            '<input type="hidden" name="node_id" value="' + node_id + '">' +
+            '<input type="hidden" name="node_interface" value="' + node_interface + '">' +
+            '<input type="input" name="color" class="form-control link_color" value="' + int_color + '">' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="row">' +
+            '<div class="col-md-6 form-group">' +
+            '<label class="col-md-6 control-label form-group-addon">Link Type</label>' +
+            '<div class="col-md-5">' +
+            '<select name="style" id="style">' +
+            '<option value="Straight">Straight</option>' +
+            '<option value="Bezier">Curved</option>' +
+            '</select>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="row">' +
+            '<div class="col-md-6  form-group">' +
+            '<label class="col-md-6 control-label form-group-addon">Link Label</label>' +
+            '<div class="col-md-5">' +
+            '<input type="input" name="label"  value="' + int_label + '">' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<button type="submit" class="btn btn-success">' + MESSAGES[47] + '</button>' +
+            '<button type="button" class="btn" data-dismiss="modal">' + MESSAGES[18] + '</button>' +
+            '</div>' +
+            '</form>';
+        addModal("Edit-Link", html, '','','edit-link');
+        // hides text box to input color
+        $('input[name="color"]').hide()
 
-    $('input.link_color').colorpicker({
-        color: "#000000",
-        defaultPalette: 'web'
-    })
+        $('#style option[value=' + int_style +']').attr('selected', 'selected');
+        $('input.link_color').colorpicker({
+            defaultPalette: 'web'
+        })
 
- $('#body').append(html);
+        $('#body').append(html);
+    });
+
+
+
+
 }
 
 // Edit Form: Custom Shape

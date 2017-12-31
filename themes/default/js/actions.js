@@ -2338,10 +2338,14 @@ $(document).on('submit', '#editConn', function (e) {
     var form_data = {};
     var node_id = this[0].value
     var interface_color = this[2].value
+    var interface_style = this[3].value
+    var interface_label = this[4].value
     var node_interface = this[1].value
     form_data['nodeId'] = node_id
     form_data['color'] = interface_color
     form_data['interfaceId'] = node_interface
+    form_data['style'] = interface_style
+    form_data['label'] = interface_label
     var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/interface/color';
     var type = 'PUT';
     $.ajax({

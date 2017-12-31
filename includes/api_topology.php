@@ -38,6 +38,8 @@ function apiGetLabTopology($lab) {
 							'source_type' => 'node',
 							'source_label' => $interface -> getName(),
 							'link_color' => $interface -> getInterfaceColor(),
+                            'link_style' => $interface -> getInterfaceStyle(),
+                            'link_label' => $interface -> getInterfaceLabel(),
 							'destination' => 'network'.$interface -> getNetworkId(),
 							'destination_type' => 'network',
 							'destination_label' => ''
@@ -54,6 +56,8 @@ function apiGetLabTopology($lab) {
 							'source_type' => 'node',
 							'source_label' => $interface -> getName(),
 							'link_color' => $interface -> getInterfaceColor(),
+                            'link_style' => $interface -> getInterfaceStyle(),
+                            'link_label' => $interface -> getInterfaceLabel(),
 							'destination' => 'network'.$interface -> getNetworkId(),
 							'destination_type' => 'network',
 							'destination_label' => ''
@@ -69,6 +73,8 @@ function apiGetLabTopology($lab) {
 								'source_type' => 'node',
 								'source_label' => $interface -> getName(),
 								'link_color' => $interface -> getInterfaceColor(),
+                                'link_style' => $interface -> getInterfaceStyle(),
+                                'link_label' => $interface -> getInterfaceLabel(),
 								'destination' => 'network'.$interface -> getNetworkId(),
 								'destination_type' => 'network',
 								'destination_label' => ''
@@ -85,6 +91,8 @@ function apiGetLabTopology($lab) {
 												'source_type' => 'node',
 												'source_label' => $interface -> getName(),
 												 'link_color' => $interface -> getInterfaceColor(),
+                                                'link_style' => $interface -> getInterfaceStyle(),
+                                                'link_label' => $interface -> getInterfaceLabel(),
 												'destination' => 'node'.$remote_node_id,
 												'destination_type' => 'node',
 												'destination_label' => $remote_interface -> getName(),
