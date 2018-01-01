@@ -3478,7 +3478,7 @@ function printLabTopology() {
 
 
                         var tmp_conn = lab_topology.connect({
-                            connector: [link_style, { curviness: 100 }],
+                            connector: link_style,
                             source: source,       // Must attach to the IMG's parent or not printed correctly
                             target: destination,  // Must attach to the IMG's parent or not printed correctly
                             cssClass: source + ' ' + destination + ' frame_ethernet',
@@ -4496,7 +4496,7 @@ function getTextObject(id) {
         dataType: 'json',
         success: function (data) {
             if (data['status'] == 'success') {
-                logger(1, 'DEBUG: got shape ' + id + 'from lab "' + lab_filename + '".');
+                //logger(1, 'DEBUG: got shape ' + id + 'from lab "' + lab_filename + '".');
 
                 try {
                     if ( data['data'].data.indexOf('div') != -1  ) {
@@ -4787,7 +4787,9 @@ function printFormEditLink(id) {
             '<div class="col-md-5">' +
             '<select name="style" id="style">' +
             '<option value="Straight">Straight</option>' +
-            '<option value="Bezier">Curved</option>' +
+            '<option value="Bezier">Bezier</option>' +
+            '<option value="StateMachine">StateMachine</option>' +
+            '<option value="Flowchart">Flowchart</option>' +
             '</select>' +
             '</div>' +
             '</div>' +

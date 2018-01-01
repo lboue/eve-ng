@@ -413,6 +413,7 @@ body.login {
 
 #lab-viewport .node_interface {
 	background-color: #e6f5ff;
+	border: 2px solid #346789;
 	border-radius: 8px;
     font-family: helvetica;
     font-size: 0.8em;
