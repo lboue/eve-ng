@@ -46,12 +46,13 @@ or
 chown www-data:www-data /var/run/openvswitch/db.sock
 
 
-## List of changes/New features
+## List of Changed/New features
 * Linux bridge code is replaced for Open Virtual Switch
-* Docker support was mostly functional, but made a few small changes to make it function
+* Docker support added
 * Rewrote handler function for docker to support vnc, telnet and w/custom ports
 * Rewrote capture handler to capture traffic locally to docker node
 * Ability to add links to already running devices (hotadd)
+* Feature to edit link color, style (curved,straight) and add an additional label in the middle of the link
 
 ## Known Issues and todos
 * new functions need to be wrapped properly so we don't need to modify permissions
