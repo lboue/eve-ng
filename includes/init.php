@@ -76,6 +76,7 @@ if (!isset($node_config)) {
 if (!isset($node_templates)) {
 	$node_templates = Array(
 		'a10'			=>	'A10 vThunder',
+		'apsim'                 =>      'apsim',
 		'clearpass'		=>	'Aruba ClearPass',
 		'veos'			=>	'Arista vEOS',
 		'barracuda'		=>	'Barraccuda NGIPS',

@@ -967,10 +967,8 @@ class Node {
                         }
 			$qversion = ( $this -> getQemu_version() != "" ) ? $this -> getQemu_version() : ( isset($p['qemu_version']) ? $p['qemu_version'] : "" );
 			if ( $qversion != "" ) {
-                                error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80015]);
                                 $bin .= '/opt/qemu-'.$qversion.'/bin/qemu-system-'.$qarch;
 			} else {
-                                error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][80015]);
                                 $bin .= '/opt/qemu/bin/qemu-system-'.$qarch;
                         }
 
@@ -3304,6 +3302,9 @@ class Node {
         if (isset($this -> ethernets[$interfaceId])) {
             return $this -> ethernets[$interfaceId] -> edit(Array('color' => $i['color']));
         }
+        else {
+            return $this -> serials[$interfaceId] -> edit(Array('color' => $i['color']));
+        }
     }
 
     /**
@@ -3318,7 +3319,11 @@ class Node {
         if (isset($this -> ethernets[$interfaceId])) {
             return $this -> ethernets[$interfaceId] -> edit(Array('style' => $i['style']));
         }
-    }
+        else {
+            return $this->serials[$interfaceId]->edit(Array('style' => $i['style']));
+        }
+	}
+
     /**
      * Method to edit interface label
      *
@@ -3330,6 +3335,9 @@ class Node {
         // Ethernet interface
         if (isset($this -> ethernets[$interfaceId])) {
             return $this -> ethernets[$interfaceId] -> edit(Array('label' => $i['label']));
+        }
+        else {
+            return $this->serials[$interfaceId]->edit(Array('label' => $i['label']));
         }
     }
 

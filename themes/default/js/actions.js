@@ -340,6 +340,7 @@ $(document).on('contextmenu', '#lab-viewport', function (e) {
     if (ROLE != "user" && LOCK == 0 ) {
         var body = '';
         body += '<li><a class="action-nodeplace" href="javascript:void(0)"><i class="glyphicon glyphicon-hdd"></i> ' + MESSAGES[81] + '</a></li>';
+        body += '<li><a class="action-groupplace" href="javascript:void(0)"><i class="glyphicon glyphicon-list-alt"></i> Group </a></li>';
         body += '<li><a class="action-networkplace" href="javascript:void(0)"><i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[82] + '</a></li>';
         body += '<li><a class="action-pictureadd" href="javascript:void(0)"><i class="glyphicon glyphicon-picture"></i> ' + MESSAGES[83] + '</a></li>';
         body += '<li><a class="action-customshapeadd" href="javascript:void(0)"><i class="glyphicon glyphicon-unchecked"></i> ' + MESSAGES[145] + '</a></li>';
@@ -1142,7 +1143,7 @@ $(document).on('click', '.action-networkadd', function (e) {
 });
 
 // Place an object
-$(document).on('click', '.action-nodeplace, .action-networkplace, .action-customshapeadd, .action-textadd', function (e) {
+$(document).on('click', '.action-nodeplace, .action-groupplace, .action-networkplace, .action-customshapeadd, .action-textadd', function (e) {
     var target = $(this)
         , object
         , frame = ''
@@ -1152,6 +1153,8 @@ $(document).on('click', '.action-nodeplace, .action-networkplace, .action-custom
 
     if (target.hasClass('action-nodeplace')) {
         object = 'node';
+    } else if (target.hasClass('action-groupplace')) {
+        object = 'group';
     } else if (target.hasClass('action-networkplace')) {
         object = 'network';
     } else if (target.hasClass('action-customshapeadd')) {

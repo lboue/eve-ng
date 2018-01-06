@@ -3442,9 +3442,9 @@ function printLabTopology() {
                         lnk_label = ["Label"],
                         dst_label = ["Label"];
 
+                    logger(1, 'DEBUG: got color for link "' + link_color + '".');
 
 
-                    if (type == 'ethernet') {
                         if (link_label != '') {
                             lnk_label.push({
                                 label: link_label,
@@ -3481,7 +3481,6 @@ function printLabTopology() {
                             connector: link_style,
                             source: source,       // Must attach to the IMG's parent or not printed correctly
                             target: destination,  // Must attach to the IMG's parent or not printed correctly
-                            cssClass: source + ' ' + destination + ' frame_ethernet',
                             paintStyle: {strokeWidth: 2, stroke: link_color + ''},
                             overlays: [src_label, dst_label,lnk_label]
                         });
@@ -3492,35 +3491,15 @@ function printLabTopology() {
                                          tmp_conn.id = 'iface:'+source+":"+ikey
                                       }
                                   }
+                                  for ( ikey in ifaces['serial'] ) {
+                                      if (ifaces['serial'][ikey]['name'] == source_label) {
+                                          tmp_conn.id = 'iface:' + source + ':' + ikey
+                                      }
+                                  }
                               });
 
-                    } else {
-                        src_label.push({
-                            label: source_label,
-                            location: 0.15,
-                            cssClass: 'node_interface ' + source + ' ' + destination,
-                        });
-                        dst_label.push({
-                            label: destination_label,
-                            location: 0.85,
-                            cssClass: 'node_interface ' + source + ' ' + destination
-                        });
-                        var tmp_conn = lab_topology.connect({
-                            source: source,       // Must attach to the IMG's parent or not printed correctly
-                            target: destination,  // Must attach to the IMG's parent or not printed correctly
-                            cssClass: source + " " + destination + ' frame_serial',
-                            paintStyle: {strokeWidth: 2, stroke: "#ffcc00"},
-                            overlays: [src_label, dst_label]
-                        });
-                        $.when( getNodeInterfaces(source.replace('node',''))).done( function ( ifaces ) {
-                             for ( ikey in ifaces['serial'] ) {
-                                    if ( ifaces['serial'][ikey]['name'] == source_label ) {
-                                        tmp_conn.id = 'iface:'+source+':'+ikey
-                                    }
 
-                             }
-                        });
-                    }
+
                     // If destination is a network, remove the 'unused' class
                     if (destination.substr(0, 7) == 'network') {
                         $('.' + destination).removeClass('unused');
@@ -4496,7 +4475,7 @@ function getTextObject(id) {
         dataType: 'json',
         success: function (data) {
             if (data['status'] == 'success') {
-                //logger(1, 'DEBUG: got shape ' + id + 'from lab "' + lab_filename + '".');
+                logger(1, 'DEBUG: got shape ' + id + 'from lab "' + lab_filename + '".');
 
                 try {
                     if ( data['data'].data.indexOf('div') != -1  ) {
@@ -4770,6 +4749,15 @@ function printFormEditLink(id) {
                 int_label=ifaces['ethernet'][ikey]['label']
             }
         }
+
+            for ( ikey in ifaces['serial'] ) {
+
+                if ( ikey == node_interface ) {
+                    int_color=ifaces['serial'][ikey]['color']
+                    int_style=ifaces['serial'][ikey]['style']
+                    int_label=ifaces['serial'][ikey]['label']
+                }
+            }
         var html = '<form id="editConn" class="editConn-form">' +
             '<div class="row">' +
             '<div class="col-md-6 form-group">' +

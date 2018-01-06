@@ -13,6 +13,9 @@
  * @version 20160719
  * @property type $id Interface ID. It's mandatory and automatically set during contruction phase.
  * @property type $name Name of the interface. It's optional.
+ * @property type $color Color of the interface. It's optional.
+ * @property type $style Style of the interface. It's optional.
+ * @property type $label label of the interface. It's optional.
  * @property type $network_id Remote network ID for Ethernet interfaces. If not set, it's automatically set to 0.
  * @property type $remote_id Remote node ID for Serial interfaces. If not set, it's automatically set to 0.
  * @property type $remote_if Remote interface ID for Serial interfaces. If not set, it's automatically set to 0. 
@@ -30,20 +33,20 @@ class Interfc {
 	private $remote_if;
 	private $type;
 
-	/**
-	 * Constructor which creates an interface.
-	 * Parameters:
-	 * - $name
-	 * - $network_id
-	 * - $remote_id
-	 * - $remote_if
-	 * - $type*
-	 * *mandatory
-	 *
-	 * @param   Array   $p                  Parameters
-	 * @return  void
-	 *
-	 */
+    /**
+     * Constructor which creates an interface.
+     * Parameters:
+     * - $name
+     * - $network_id
+     * - $remote_id
+     * - $remote_if
+     * - $type*
+     * *mandatory
+     *
+     * @param   Array $p Parameters
+     * @param $id
+     * @throws Exception
+     */
 	public function __construct($p, $id) {
 		// Mandatory parameters
 		if (!isset($p['type'])) {
@@ -153,8 +156,8 @@ class Interfc {
 			 unset($p['color']);
 			 $modified = True;
 		} else if (isset($p['color'])) {
-                        $this -> color = htmlentities($p['color']);
-                        $modified = True;
+			$this -> color = htmlentities($p['color']);
+			$modified = True;
         }
         if (isset($p['style']) && $p['style'] === '') {
             // Style is empty, unset the current one
@@ -265,7 +268,7 @@ class Interfc {
 
 	/**
 	 * Method to get remote network ID.
-	 * 
+	 *
 	 * @return	string                      Remote network ID or 0 if not set or not "ethernet" type
 	 */
 	public function getNetworkId() {
@@ -294,7 +297,7 @@ class Interfc {
     /**
      * Method to get interface label.
      *
-     * @return      string                      Interface color
+     * @return      string                      Interface label
      */
     public function getInterfaceLabel() {
         if (isset($this -> label)) {
@@ -307,7 +310,7 @@ class Interfc {
     /**
      * Method to get interface style.
      *
-     * @return      string                      Interface color
+     * @return      string                      Interface Style
      */
     public function getInterfaceStyle() {
         if (isset($this -> style)) {

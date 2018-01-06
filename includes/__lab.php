@@ -681,35 +681,27 @@ class Lab {
 		}
 	}
     /**
-     * Method to edit an interface color
+     * Method to edit an interface
      *
      * @param   Array   $p                  Parameters
      * @return	int	                        0 if OK
      */
-    public function editInterfaceColor($p) {
-        $id = $p['nodeId'];
-        if ($this->nodes[$id]->editInterfaceColor($p) === 0) {
-            return $this->save();
-        }
-    }
-    /**
-     * Method to edit an interface style
-     *
-     * @param   Array   $p                  Parameters
-     * @return	int	                        0 if OK
-     */
-    public function editInterfaceStyle($p) {
+    public function editInterface($p) {
         $id = $p['nodeId'];
         if ($this->nodes[$id]->editInterfaceStyle($p) === 0) {
-            return $this->save();
+            $modified = True;
         }
-    }
-    public function editInterfaceLabel($p) {
-        $id = $p['nodeId'];
+        if ($this->nodes[$id]->editInterfaceColor($p) === 0) {
+            $modified = True;
+        }
         if ($this->nodes[$id]->editInterfaceLabel($p) === 0) {
+            $modified = True;
+        }
+        if ($modified) {
             return $this->save();
         }
     }
+
 	/**
 	 * Method to edit a network.
 	 *
@@ -1344,6 +1336,9 @@ public function disconnectNodeInterface($id,$interface_id) {
 							$e -> addAttribute('id', $interface_id);
 							$e -> addAttribute('type', $interface -> getNType());
 							$e -> addAttribute('name', $interface -> getName());
+                            $e -> addAttribute('color', $interface -> getInterfaceColor());
+                            $e -> addAttribute('style', $interface -> getInterfaceStyle());
+                            $e -> addAttribute('label', $interface -> getInterfaceLabel());
 							$e -> addAttribute('remote_id', $interface -> getRemoteId());
 							$e -> addAttribute('remote_if', $interface -> getRemoteIf());
 						}

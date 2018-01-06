@@ -294,11 +294,10 @@ function apiEditLabNodeInterfaces($lab, $id, $p) {
  * @param   Array   $p                  Parameters
  * @return  Array                       Lab node (JSend data)
  */
-function apiEditLabNodeInterfaceColor($lab, $id, $p) {
+function apiEditLabNodeInterface($lab, $id, $p) {
 	//to do refactor in to single
-    $rc = $lab -> editInterfaceColor($p);
-    $rc = $lab -> editInterfaceStyle($p);
-    $rc = $lab -> editInterfaceLabel($p);
+    $rc = $lab -> editInterface($p);
+
     if ($rc === 0) {
         $output['code'] = 201;
         $output['status'] = 'success';
@@ -581,6 +580,9 @@ function apiGetLabNodeInterfaces($lab, $id) {
 			$remoteIf = $interface -> getRemoteIf();
 			$serials[$interface_id] = Array(
 				'name' => $interface -> getName(),
+                'color' => $interface -> getInterfaceColor(),
+                'style' => $interface -> getInterfaceStyle(),
+                'label' => $interface -> getInterfaceLabel(),
 				'remote_id' =>$remoteId,
 				'remote_if' => $remoteIf,
 				'remote_if_name' => $remoteId?$lab -> getNodes()[$remoteId]-> getSerials()[$remoteIf]-> getName():'',
