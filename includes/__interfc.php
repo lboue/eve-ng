@@ -28,6 +28,8 @@ class Interfc {
 	private $color;
     private $style;
     private $label;
+    private $anchor;
+    private $dash;
 	private $network_id;
 	private $remote_id;
 	private $remote_if;
@@ -84,6 +86,16 @@ class Interfc {
             unset($p['label']);
             error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10002]);
         }
+        if (isset($p['dash']) && $p['dash'] === '') {
+            // Dash is empty, ignored
+            unset($p['dash']);
+            error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10002]);
+        }
+        if (isset($p['anchor']) && $p['anchor'] === '') {
+            // Anchor is empty, ignored
+            unset($p['anchor']);
+            error_log(date('M d H:i:s ').'WARNING: '.$GLOBALS['messages'][10002]);
+        }
 
 		if ($p['type'] == 'ethernet') {
 			if (isset($p['network_id']) && (int) $p['network_id'] <= 0) {
@@ -111,9 +123,11 @@ class Interfc {
 		$this -> id = (int) $id;
 		$this -> type = $p['type'];
 		if (isset($p['color'])) $this -> color = htmlentities($p['color']);
-        if (isset($p['style'])) $this -> color = htmlentities($p['style']);
-        if (isset($p['label'])) $this -> color = htmlentities($p['label']);
+        if (isset($p['style'])) $this ->  style = htmlentities($p['style']);
+        if (isset($p['label'])) $this -> label = htmlentities($p['label']);
 		if (isset($p['name'])) $this -> name = htmlentities($p['name']);
+        if (isset($p['dash'])) $this -> dash = htmlentities($p['dash']);
+        if (isset($p['anchor'])) $this -> anchor = htmlentities($p['anchor']);
 
 		// Building ethernet interface
 		if ($p['type'] == 'ethernet') {
@@ -173,6 +187,22 @@ class Interfc {
             $modified = True;
         } else if (isset($p['label'])) {
             $this -> label = htmlentities($p['label']);
+            $modified = True;
+        }
+        if (isset($p['anchor']) && $p['anchor'] === '') {
+            // Anchor is empty, unset the current one
+            unset($p['anchor']);
+            $modified = True;
+        } else if (isset($p['anchor'])) {
+            $this -> anchor = htmlentities($p['anchor']);
+            $modified = True;
+        }
+        if (isset($p['dash']) && $p['dash'] === '') {
+            // Dash is empty, unset the current one
+            unset($p['dash']);
+            $modified = True;
+        } else if (isset($p['dash'])) {
+            $this -> dash = htmlentities($p['dash']);
             $modified = True;
         }
 
@@ -318,6 +348,32 @@ class Interfc {
         }
         else {
             return "Straight";
+        }
+    }
+    /**
+     * Method to get interface anchor.
+     *
+     * @return      string                      Interface anchor
+     */
+    public function getInterfaceAnchor() {
+        if (isset($this -> anchor)) {
+            return $this -> anchor;
+        }
+        else {
+            return "";
+        }
+    }
+    /**
+     * Method to get interface anchor.
+     *
+     * @return      string                      Interface dash
+     */
+    public function getInterfaceDash() {
+        if (isset($this -> dash)) {
+            return $this -> dash;
+        }
+        else {
+            return "";
         }
     }
 

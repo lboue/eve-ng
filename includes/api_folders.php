@@ -225,12 +225,16 @@ function apiGetFolders($path) {
 				if ($path == '/') {
 					$labs[] = Array(
 						'file' => $element,
-						'path' => '/'.$element
+						'path' => '/'.$element,
+						'umtime' => filemtime(BASE_LAB.$path.'/'.$element),
+						'mtime' => date ("d M Y H:i", filemtime(BASE_LAB.$path.'/'.$element))
 					);
 				} else {
 					$labs[] = Array(
 						'file' => $element,
-						'path' => $path.'/'.$element
+						'path' => $path.'/'.$element,
+						'umtime' => filemtime(BASE_LAB.$path.'/'.$element),
+						'mtime' => date ("d M Y  H:i", filemtime(BASE_LAB.$path.'/'.$element))
 					);
 				}
 				continue;

@@ -406,8 +406,17 @@ $(document).on('contextmenu', '.context-menu', function (e) {
                            '<i class="glyphicon glyphicon-save"></i> ' + MESSAGES[69] +
                            '</a>' +
                            '</li>';
+
+
         }
                 // capture section
+        body += '<li role="separator" class="divider">' +
+        '</li>';
+            body +=   '<li>' +
+            '<a class="action-nodesetcapture" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
+            '<i class="glyphicon glyphicon-save"></i>Make Capture Node ' +
+            '</a>' +
+            '</li>';
                 body += '<li role="separator" class="divider">' +
                 '</li>' +
                 '<li id="menu-node-interfaces">' +
@@ -421,12 +430,12 @@ $(document).on('contextmenu', '.context-menu', function (e) {
                 // Read privileges and set specific actions/elements
                 if ((ROLE == 'admin' || ROLE == 'editor') &&  LOCK == 0  ) {
 
-                    body += '<li role="separator" class="divider">';/* +
+                    body += '<li role="separator" class="divider">' +
                         '<li>' +
                             '<a class="action-nodeinterfaces" data-path="' + node_id + '" data-name="' + title + '"  data-status="'+ status +'" href="javascript:void(0)">' +
                         '<i class="glyphicon glyphicon-transfer"></i> ' + MESSAGES[72] +
                         '</a>' +
-                        '</li>';*/
+                        '</li>';
                         if(!isNodeRunning){
                             body += '<li>' +
                             '<a class="action-nodeedit control" data-path="' + node_id + '" data-name="' + title + '" href="javascript:void(0)">' +
@@ -2343,12 +2352,16 @@ $(document).on('submit', '#editConn', function (e) {
     var interface_color = this[2].value
     var interface_style = this[3].value
     var interface_label = this[4].value
+    var interface_dash = this[5].value
+    var interface_anchor = this[6].value
     var node_interface = this[1].value
     form_data['nodeId'] = node_id
     form_data['color'] = interface_color
     form_data['interfaceId'] = node_interface
     form_data['style'] = interface_style
     form_data['label'] = interface_label
+    form_data['dash'] = interface_dash
+    form_data['anchor'] = interface_anchor
     var url = '/api/labs' + lab_filename + '/nodes/' + node_id + '/interface/color';
     var type = 'PUT';
     $.ajax({

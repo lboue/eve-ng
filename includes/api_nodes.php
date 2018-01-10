@@ -21,7 +21,7 @@
  * @param   bool    $o                  True if need to add ID to name
  * @return  Array                       Return code (JSend data)
  */
-require_once(BASE_DIR.'/html/includes/cli.php');
+//require_once(BASE_DIR.'/html/includes/cli.php');
 
 function apiAddLabNode($lab, $p, $o) {
 	if (isset($p['numberNodes'])) 
@@ -90,7 +90,7 @@ function apiDeleteLabNode($lab, $id, $tenant) {
 	$cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper -a wipe -T 0 -D '.$id.' -F "'.$lab -> getPath().'/'.$lab -> getFilename().'"';  // Tenant not required for delete operation
 	exec($cmd, $o, $rc);
 	// Stop the node
-	/*
+
 	foreach( scandir("/opt/unetlab/tmp/") as $value ) {	
 		if ( is_dir("/opt/unetlab/tmp/".$value) and intval($value) >= 0 ) {
 			$output=apiStopLabNode($lab, $id, intval($value)); 
@@ -98,7 +98,7 @@ function apiDeleteLabNode($lab, $id, $tenant) {
 			if ($output['status'] == 400 ) return $output; 	
 		}
 	}
-	*/
+
 	// Deleting the node
 	$rc = $lab -> deleteNode($id);
 	if ($rc === 0) {
@@ -295,7 +295,7 @@ function apiEditLabNodeInterfaces($lab, $id, $p) {
  * @return  Array                       Lab node (JSend data)
  */
 function apiEditLabNodeInterface($lab, $id, $p) {
-	//to do refactor in to single
+
     $rc = $lab -> editInterface($p);
 
     if ($rc === 0) {
@@ -571,7 +571,9 @@ function apiGetLabNodeInterfaces($lab, $id) {
 				'network_id' => $interface -> getNetworkId(),
 				'color' => $interface -> getInterfaceColor(),
                 'style' => $interface -> getInterfaceStyle(),
-                'label' => $interface -> getInterfaceLabel()
+                'label' => $interface -> getInterfaceLabel(),
+                'anchor' => $interface -> getInterfaceAnchor(),
+                'dash' => $interface -> getInterfaceDash()
 			);
 		}
 		$serials = Array();
@@ -583,6 +585,8 @@ function apiGetLabNodeInterfaces($lab, $id) {
                 'color' => $interface -> getInterfaceColor(),
                 'style' => $interface -> getInterfaceStyle(),
                 'label' => $interface -> getInterfaceLabel(),
+                'anchor' => $interface -> getInterfaceAnchor(),
+                'dash' => $interface -> getInterfaceDash(),
 				'remote_id' =>$remoteId,
 				'remote_if' => $remoteIf,
 				'remote_if_name' => $remoteId?$lab -> getNodes()[$remoteId]-> getSerials()[$remoteIf]-> getName():'',
@@ -897,28 +901,6 @@ function apiStartLabNode($lab, $id, $tenant) {
 	}
 	return $output;
 }
-
-function apiAddIntOn($lab, $tenant) {
-        $cmd = 'sudo /opt/unetlab/wrappers/unl_wrapper';
-        $cmd .= ' -a addinton';
-        $cmd .= ' -T '.$tenant;
-        $cmd .= ' -F "'.$lab -> getPath().'/'.$lab -> getFilename().'"';
-        $cmd .= ' 2>> /opt/unetlab/data/Logs/unl_wrapper.txt';
-        exec($cmd, $o, $rc);
-        if ($rc == 0) {
-                // Nodes started
-                $output['code'] = 200;
-                $output['status'] = 'success';
-                $output['message'] = $GLOBALS['messages'][80048];
-        } else {
-                // Failed to start
-                $output['code'] = 400;
-                $output['status'] = 'fail';
-                $output['message'] = $GLOBALS['messages'][$rc];
-        }
-        return $output;
-}
-
 
 /**
  * Function to start all nodes.

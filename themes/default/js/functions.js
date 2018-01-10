@@ -3388,7 +3388,7 @@ function printLabTopology() {
                      $.each(nodes, function (key,value) {
                            lab_topology.makeSource('node' + value['id'], {
                                 filter: ".ep",
-                                Anchor:"Continuous",
+                                anchor:"Continuous",
                                 extract:{
                                     "action":"the-action"
                                 },
@@ -3400,7 +3400,7 @@ function printLabTopology() {
 
                           lab_topology.makeTarget( $('#node' + value['id']), {
                                 dropOptions: { hoverClass: "dragHover" },
-                                anchor: "Continuous",
+                                anchor:"Continuous",
                                 allowLoopback: false
                           });
                           adjustZoom(lab_topology, window.scroll_top || 0, window.scroll_left || 0)
@@ -3408,7 +3408,7 @@ function printLabTopology() {
                     $.each(networks, function (key,value) {
                            if ( value['visibility'] == 1 ) lab_topology.makeSource('network' + value['id'], {
                                 filter: ".ep",
-                                Anchor:"Continuous",
+                                anchor:"Continuous",
                                 connectionType:"basic",
                                 extract:{
                                     "action":"the-action"
@@ -3421,7 +3421,7 @@ function printLabTopology() {
 
                           if ( value['visibility'] == 1 ) lab_topology.makeTarget($('#network' + value['id']), {
                                 dropOptions: { hoverClass: "dragHover" },
-                                anchor: "Continuous",
+                                anchor:"Continuous",
                                 allowLoopback: false
                           });
                         adjustZoom(lab_topology, window.scroll_top || 0, window.scroll_left || 0)
@@ -3436,13 +3436,15 @@ function printLabTopology() {
 			            link_color = link['link_color'],
                         link_style = link['link_style'],
                         link_label = link['link_label'],
+                        link_anchor = ''+ link['link_anchor'],
+                        link_dash = link['link_dash'],
                         destination = link['destination'],
                         destination_label = link['destination_label'],
                         src_label = ["Label"],
                         lnk_label = ["Label"],
                         dst_label = ["Label"];
 
-                    logger(1, 'DEBUG: got color for link "' + link_color + '".');
+
 
 
                         if (link_label != '') {
@@ -3475,15 +3477,28 @@ function printLabTopology() {
                         } else {
                             dst_label.push(Object());
                         }
-
-
+                    if (link_anchor)
+                    {
+                       // logger(1, 'DEBUG: got anchor for link "' + link_anchor + '".');
+                        var tmp_conn = lab_topology.connect({
+                        Anchor:["Continuous", {faces: ['' + link_anchor + '']}],
+                        connector: link_style,
+                        source: source,       // Must attach to the IMG's parent or not printed correctly
+                        target: destination,  // Must attach to the IMG's parent or not printed correctly
+                        paintStyle: {strokeWidth: 2,  dashstyle: ''+ link_dash +'', stroke: link_color + ''},
+                        overlays: [src_label, dst_label,lnk_label]
+                        });
+                    }
+                    else {
+                        //logger(1, 'DEBUG: else for link "' + link_dash + '".');
                         var tmp_conn = lab_topology.connect({
                             connector: link_style,
                             source: source,       // Must attach to the IMG's parent or not printed correctly
                             target: destination,  // Must attach to the IMG's parent or not printed correctly
-                            paintStyle: {strokeWidth: 2, stroke: link_color + ''},
-                            overlays: [src_label, dst_label,lnk_label]
+                            paintStyle: {strokeWidth: 2, dashstyle: '' + link_dash + '', stroke: link_color + ''},
+                            overlays: [src_label, dst_label, lnk_label]
                         });
+                    }
                       //todo: we only change the color of the first node in a two node link
                               $.when( getNodeInterfaces(source.replace('node',''))).done( function ( ifaces ) {
                                   for ( ikey in ifaces['ethernet'] ) {
@@ -3800,7 +3815,7 @@ function createNodeListRow(template, id){
         if ((ROLE == 'admin' || ROLE == 'editor') && LOCK == 0 ) {
             html_data += '<a class="action-nodeexport" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[69] + '"><i class="glyphicon glyphicon-save"></i></a> '+
                          '<a class="action-nodeinterfaces" data-status="' + node_values['status'] +'" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[72] + '"><i class="glyphicon glyphicon-transfer"></i></a>'+
-                         '<a class="action-nodeedit control'+ disabledClass +'" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a>'+
+                '<a class="action-nodeedit control'+ disabledClass +'" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[71] + '"><i class="glyphicon glyphicon-edit"></i></a>'+
                          '<a class="action-nodedelete'+ disabledClass +'" data-path="' + id + '" data-name="' + checkTemplateValue(template_values['options'],'name') + '" href="javascript:void(0)" title="' + MESSAGES[65] + '"><i class="glyphicon glyphicon-trash"></i></a>';
         } 
         html_data += '</div></td></tr>';
@@ -4740,6 +4755,8 @@ function printFormEditLink(id) {
     var int_color = '';
     var int_style = '';
     var int_label = '';
+    var int_anchor = '';
+    var int_dash = '';
     $.when(getNodeInterfaces(node_id)).done(function (ifaces) {
         for ( ikey in ifaces['ethernet'] ) {
 
@@ -4747,6 +4764,8 @@ function printFormEditLink(id) {
                 int_color=ifaces['ethernet'][ikey]['color']
                 int_style=ifaces['ethernet'][ikey]['style']
                 int_label=ifaces['ethernet'][ikey]['label']
+                int_anchor=ifaces['ethernet'][ikey]['anchor']
+                int_dash=ifaces['ethernet'][ikey]['dash']
             }
         }
 
@@ -4756,6 +4775,8 @@ function printFormEditLink(id) {
                     int_color=ifaces['serial'][ikey]['color']
                     int_style=ifaces['serial'][ikey]['style']
                     int_label=ifaces['serial'][ikey]['label']
+                    int_anchor=ifaces['serial'][ikey]['anchor']
+                    int_dash=ifaces['serial'][ikey]['dash']
                 }
             }
         var html = '<form id="editConn" class="editConn-form">' +
@@ -4790,6 +4811,28 @@ function printFormEditLink(id) {
             '</div>' +
             '</div>' +
             '</div>' +
+            '<div class="row">' +
+            '<div class="col-md-6  form-group">' +
+            '<label class="col-md-6 control-label form-group-addon">Link Dash</label>' +
+            '<div class="col-md-5">' +
+            '<input type="input" name="dash"  value="' + int_dash + '">' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="row">' +
+            '<div class="col-md-6 form-group">' +
+            '<label class="col-md-6 control-label form-group-addon">Link Anchor</label>' +
+            '<div class="col-md-5">' +
+            '<select name="anchor" id="anchor">' +
+            '<option value=""></option>' +
+            '<option value="left">Left</option>' +
+            '<option value="right">Right</option>' +
+            '<option value="top">Top</option>' +
+            '<option value="bottom">Bottom</option>' +
+            '</select>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
             '<button type="submit" class="btn btn-success">' + MESSAGES[47] + '</button>' +
             '<button type="button" class="btn" data-dismiss="modal">' + MESSAGES[18] + '</button>' +
             '</div>' +
@@ -4799,6 +4842,7 @@ function printFormEditLink(id) {
         $('input[name="color"]').hide()
 
         $('#style option[value=' + int_style +']').attr('selected', 'selected');
+        $('#anchor option[value=' + int_anchor +']').attr('selected', 'selected');
         $('input.link_color').colorpicker({
             defaultPalette: 'web'
         })

@@ -21,7 +21,7 @@
  * @param   bool    $o                  True if need to add ID to name
  * @return  Array                       Return code (JSend data)
  */
-require_once(BASE_DIR.'/html/includes/cli.php');
+//require_once(BASE_DIR.'/html/includes/cli.php');
 
 function apiAddLabNetwork($lab, $p, $o) {
 	// Adding network_id to network_name if required

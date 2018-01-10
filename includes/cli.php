@@ -318,7 +318,6 @@ function delOvs($s) {
 		error_log(date('M d H:i:s ').implode("\n", $o));
 		return 80024;
 	}
-	return 0;
 }
 /**
  * Function to disconnect a node port from an ovs bridge or pnet
@@ -1085,30 +1084,31 @@ function stop($n) {
 	$tenantNodeId = explode("-",$n -> getUuid());
 
 	if ($n -> getStatus() != 0) {
-		if ($n -> getNType() == 'docker') {
-		 foreach ($n -> getEthernets() as $interface_id => $interface) {
-                        // We specify the names of our interfaces
-                        $tap_name = 'vunl'.$tenantNodeId[5].'_'.$tenantNodeId[6].'_'.$interface_id;
+      if  (($n -> getNType() == 'docker') || ($n -> getNType() == 'qemu')) {
+          foreach ($n->getEthernets() as $interface_id => $interface) {
+              // We specify the names of our interfaces
+              $tap_name = 'vunl' . $tenantNodeId[5] . '_' . $tenantNodeId[6] . '_' . $interface_id;
 
-                        // For the peer which we bridge to we need to find the peer interface name
-                        if (isset($nets[$interface -> getNetworkId()]) && $nets[$interface -> getNetworkId()] -> isCloud()) {
-                                // Network is a Cloud
-                                $net_name = $nets[$interface -> getNetworkId()] -> getNType();
-                        } else {
-                                $net_name = 'vnet'.$tenantNodeId[5].'_'.$interface -> getNetworkId();
-                        }
+              // For the peer which we bridge to we need to find the peer interface name
+              if (isset($nets[$interface->getNetworkId()]) && $nets[$interface->getNetworkId()]->isCloud()) {
+                  // Network is a Cloud
+                  $net_name = $nets[$interface->getNetworkId()]->getNType();
+              } else {
+                  $net_name = 'vnet' . $tenantNodeId[5] . '_' . $interface->getNetworkId();
+              }
 
-                        // remove network port from ovs when deleting bridge
-                        if ($interface -> getNetworkId() !== 0) {
-                                // Connect interface to network
-                                $cmd = 'ovs-vsctl del-port '.$net_name.' '.$tap_name.'';
-                                error_log(date('M d H:i:s ').'INFO: Deleting interface'.$cmd);
-                                exec($cmd, $o, $rc);
-                        }
+              // remove network port from ovs when deleting bridge
+              if ($interface->getNetworkId() !== 0) {
+                  // Connect interface to network
+                  $cmd = 'ovs-vsctl del-port ' . $net_name . ' ' . $tap_name . '';
+                  error_log(date('M d H:i:s ') . 'INFO: Deleting interface' . $cmd);
+                  exec($cmd, $o, $rc);
+              }
 
-			
-		}
 
+          }
+      }
+          if  ($n -> getNType() == 'docker')  {
 			// Stop docker node
 			$cmd = 'docker -H=tcp://127.0.0.1:4243 stop '.$n -> getUuid();
 			error_log(date('M d H:i:s ').'INFO: stopping aa'.$cmd);

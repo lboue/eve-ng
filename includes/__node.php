@@ -1023,6 +1023,9 @@ class Node {
 				if ($filename == 'cdrom.iso') {
 					// CDROM
 					$flags .= ' -cdrom /opt/unetlab/addons/qemu/'.$this -> getImage().'/cdrom.iso';
+				} else if ($filename == 'kernel.img') {
+					// Custom Kernel
+					$flags .= ' -kernel /opt/unetlab/addons/qemu/'.$this -> getImage().'/kernel.img';
 				} else if (preg_match('/^megasas[a-z]+.qcow2$/', $filename)) {
 					// MegaSAS
 					$patterns[0] = '/^megasas([a-z]+).qcow2$/';
@@ -2023,6 +2026,30 @@ class Node {
 							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
 						}
 						break;
+					case 'aruba':
+						for ($i = 0; $i < $this -> ethernet; $i++) {
+							if (isset($old_ethernets[$i])) {
+								// Previous interface found, copy from old one
+								$this -> ethernets[$i] = $old_ethernets[$i];
+							} else {
+								if ($i == 0) {
+									$n = 'Not in Use';         // Interface name
+								} else {
+									$n = 'G0/0/'.($i - 1);   // Interface name
+								}
+								try {
+									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
+								} catch (Exception $e) {
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
+									return 40020;
+								}
+							}
+							// Setting CMD flags (virtual device and map to TAP device)
+							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
+						}
+						break;
 					case 'bigip':
 						for ($i = 0; $i < $this -> ethernet; $i++) {
 							if (isset($old_ethernets[$i])) {
@@ -2402,6 +2429,27 @@ class Node {
 							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
 						}
 						break;
+					case 'prime':
+						for ($i = 0; $i < $this -> ethernet; $i++) {
+							if (isset($old_ethernets[$i])) {
+								// Previous interface found, copy from old one
+								$this -> ethernets[$i] = $old_ethernets[$i];
+							} else {
+								$n = 'G'.$i;		// Interface name
+								try {
+									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
+								} catch (Exception $e) {
+									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+									error_log(date('M d H:i:s ').(string) $e);
+									return 40020;
+								}
+							}
+							// Setting CMD flags (virtual device and map to TAP device)
+							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
+						}
+						break;
+
 					case 'nsvpx':
                                                 for ($i = 0; $i < $this -> ethernet; $i++) {
                                                         if (isset($old_ethernets[$i])) {
@@ -2870,6 +2918,30 @@ class Node {
                                                         $this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
                                                 }
                                                 break;
+					case 'infoblox':
+						for ($i = 0; $i < $this -> ethernet; $i++) {
+							if (isset($old_ethernets[$i])) {
+								// Previous interface found, copy from old one
+								$this -> ethernets[$i] = $old_ethernets[$i];
+							} else {
+								if ($i == 0) {
+									$n = 'MGNT';
+								} else {
+									$n = 'LAN'.$i;
+								}
+                                                                try {
+                                                                        $this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
+                                                                } catch (Exception $e) {
+                                                                        error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+                                                                        error_log(date('M d H:i:s ').(string) $e);
+                                                                        return 40020;
+                                                                }
+                                                        }
+                                                        // Setting CMD flags (virtual device and map to TAP device)
+                                                        $this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+                                                        $this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
+                                                }
+                                                break;
 				case 'junipervrr':
                                                 for ($i = 0; $i < $this -> ethernet; $i++) {
                                                         if (isset($old_ethernets[$i])) {
@@ -2959,27 +3031,34 @@ class Node {
 							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
 						}
 						break;
-					case 'vwlc':
-						for ($i = 0; $i < $this -> ethernet; $i++) {
-							if (isset($old_ethernets[$i])) {
-								// Previous interface found, copy from old one
-								$this -> ethernets[$i] = $old_ethernets[$i];
-							} else {
-								$n = 'g0/0/'.$i;            // Interface name
-								try {
-									$this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
-								} catch (Exception $e) {
-									error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
-									error_log(date('M d H:i:s ').(string) $e);
-									return 40020;
-								}
-							}
-							// Setting CMD flags (virtual device and map to TAP device)
-							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
-							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
-						}
-						break;
-					case 'vyos':
+                    case 'vwlc':
+                        for ($i = 0; $i < $this -> ethernet; $i++) {
+                            if (isset($old_ethernets[$i])) {
+                                // Previous interface found, copy from old one
+                                $this -> ethernets[$i] = $old_ethernets[$i];
+                            } else {
+                                if ($i == 0) {
+                                    $n = 'srvc-p';            // Interface name
+                                } elseif ( $i == 1)  {
+                                    $n = 'mgmt-p';
+                                } else {
+                                    $n = 'g0/0/'.$i;            // Interface name
+                                }
+                                try {
+                                    $this -> ethernets[$i] = new Interfc(Array('name' => $n, 'type' => 'ethernet'), $i);
+                                } catch (Exception $e) {
+                                    error_log(date('M d H:i:s ').'ERROR: '.$GLOBALS['messages'][40020]);
+                                    error_log(date('M d H:i:s ').(string) $e);
+                                    return 40020;
+                                }
+                            }
+                            // Setting CMD flags (virtual device and map to TAP device)
+                            $this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+                            $this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
+                        }
+                        break;
+
+                    case 'vyos':
 						for ($i = 0; $i < $this -> ethernet; $i++) {
 							if (isset($old_ethernets[$i])) {
 								// Previous interface found, copy from old one
@@ -3023,7 +3102,7 @@ class Node {
 								}
 							}
 							// Setting CMD flags (virtual device and map to TAP device)
-							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+							$this -> flags_eth .= ' -device %NICDRIVER%,addr='.((int)($i/8)+3).'.'.($i%8).',multifunction=on,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
 							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
 						}
 						break;
@@ -3047,7 +3126,7 @@ class Node {
 								}
 							}
 							// Setting CMD flags (virtual device and map to TAP device)
-							$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
+							$this -> flags_eth .= ' -device %NICDRIVER%,addr='.((int)($i/8)+3).'.'.($i%8).',multifunction=on,netdev=net'.$i.',mac=50:'.sprintf('%02x', $this -> tenant).':'.sprintf('%02x', $this -> id / 512).':'.sprintf('%02x', $this -> id % 512).':00:'.sprintf('%02x', $i);
 							$this -> flags_eth .= ' -netdev tap,id=net'.$i.',ifname=vunl'.$this -> tenant.'_'.$this -> id.'_'.$i.',script=no';
 						}
 						break;
@@ -3338,6 +3417,38 @@ class Node {
         }
         else {
             return $this->serials[$interfaceId]->edit(Array('label' => $i['label']));
+        }
+    }
+    /**
+     * Method to edit interface dash
+     *
+     * @param   int     $i                  Interface ID
+     * @return  int                         0 means ok
+     */
+    public function editInterfaceDash($i) {
+        $interfaceId = $i['interfaceId'];
+        // Ethernet interface
+        if (isset($this -> ethernets[$interfaceId])) {
+            return $this -> ethernets[$interfaceId] -> edit(Array('dash' => $i['dash']));
+        }
+        else {
+            return $this->serials[$interfaceId]->edit(Array('dash' => $i['dash']));
+        }
+    }
+    /**
+     * Method to edit interface anchor
+     *
+     * @param   int     $i                  Interface ID
+     * @return  int                         0 means ok
+     */
+    public function editInterfaceAnchor($i) {
+        $interfaceId = $i['interfaceId'];
+        // Ethernet interface
+        if (isset($this -> ethernets[$interfaceId])) {
+            return $this -> ethernets[$interfaceId] -> edit(Array('anchor' => $i['anchor']));
+        }
+        else {
+            return $this->serials[$interfaceId]->edit(Array('anchor' => $i['anchor']));
         }
     }
 
