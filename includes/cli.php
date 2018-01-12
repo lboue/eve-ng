@@ -280,7 +280,7 @@ function connectInterface($n, $p, $nodeType) {
 	// Make sure bridge exists before adding port
 	if (isOvs($n)) {
 		if($nodeType == 'docker') {
-			$cmd = 'ovs-vsctl add-port '.$n.' '.$p.' -- set interface '.$p.' type=internal 2>&1';
+			$cmd = 'ovs-vsctl --may-exist add-port '.$n.' '.$p.' -- set interface '.$p.' type=internal 2>&1';
 		} else {
 			$cmd = 'ovs-vsctl --may-exist add-port '.$n.' '.$p.' 2>&1';
 		}
